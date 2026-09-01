@@ -76,7 +76,13 @@ svg:active { cursor: grabbing; }
 #panel .golink:hover { text-decoration: underline; }
 
 /* header */
-#hud { position: absolute; top: 16px; left: 16px; z-index: 15; max-width: 340px; }
+#hud { position: absolute; top: 16px; left: 16px; z-index: 15; max-width: 340px;
+  background: rgba(250,249,245,0.92); border-radius: 12px; padding: 12px 14px;
+  border: 1px solid rgba(228,225,215,0.8); }
+#hud.collapsible { transition: max-height .25s ease, opacity .2s; overflow: hidden; }
+#hud .hud-toggle { display: none; font-size: 11px; font-weight: 700; color: var(--mut);
+  cursor: pointer; letter-spacing: 0.08em; text-transform: uppercase; margin-top: 6px; }
+#hud .hud-toggle:hover { color: var(--ink); }
 #hud .wordmark { font-size: 11px; letter-spacing: 0.22em; font-weight: 800; color: var(--mut); }
 #hud .wordmark b { color: var(--green); }
 #hud h1 { font-size: 19px; font-weight: 750; margin-top: 6px; }
@@ -90,10 +96,18 @@ svg:active { cursor: grabbing; }
 .dimmed { opacity: 0.16; }
 path.dimmed { opacity: 0.05; }
 text.dimmed { opacity: 0.1; }
+@media (max-width: 1100px) {
+  #hud { max-width: 300px; }
+  #hud p, #hud .legend { display: none; }
+  #hud .hud-toggle { display: block; }
+  #hud.expanded p, #hud.expanded .legend { display: block; }
+  #hud.expanded { background: var(--bg); box-shadow: 0 2px 12px rgba(35,33,28,.12); }
+}
+
 </style>
 </head>
 <body>
-<div id="hud">
+<div id="hud" class="collapsible">
   <div class="wordmark">ODO<b>LOGIC</b> · argument graph</div>
   <h1>Who must this claim be true for?</h1>
   <p>Click any node to focus its neighborhood: what it needs to stand (downward), what
@@ -106,6 +120,8 @@ text.dimmed { opacity: 0.1; }
     <span><i class="lg" style="border:1.5px dashed var(--green);background:#fff;border-radius:2px"></i>certificate</span>
     <span><i class="lg" style="border:1.5px dashed var(--red);background:#fbeeec;border-radius:2px"></i>defeat</span>
   </div>
+  <div class="hud-toggle" onclick="document.getElementById('hud').classList.toggle('expanded')">
+    + how to read this</div>
 </div>
 
 <div id="panel">
