@@ -1,19 +1,33 @@
 # Odologic
 
- formerly TruthMachine, renamed September 2026
-
 A judgment ledger for machine intelligence. Every claim an LLM asserts or a document
 contains is traced along depends_on edges down to a floor of first principles, or it is
 marked as ungrounded. Named from Greek hodos (path): odological tracing is the walk from
 a standing claim to the floor.
 
+## What it does
+
+Every text you or your AI agent relies on makes claims. Odologic takes each claim,
+requires evidence for it, and traces it down a chain of dependencies to first principles,
+or marks it: assumption, contested, defeated, or unaudited. Nothing stands on fluency alone.
+
+The result:
+
+- Your AI agent stops asserting things that are provably false, because its output is
+  checked against a ledger of standing, defeated, and contested claims.
+- You learn which claims in any document actually hold, which are marketing, and
+  which are contradicted by evidence you did not know existed.
+- Every defeat is kept and becomes a hard negative, so agents get smarter with use,
+  not just better at guessing.
+
 ## Status
 
-Design and fixtures phase. Engine intentionally not started. Two questions must be
-answered in UI mockups first, per Patrick:
+Design and fixtures phase. Engine intentionally not started. The user-facing system is
+being nailed down first, in UI mockups and fixtures, so the backend serves a real usage
+model instead of an imagined one. Two flows define the product:
 
-1. How does a user use this on a pure text document, with no LLM in the loop?
-2. How does a user use this to audit an LLM's output?
+1. Paste a plain document, get every claim grounded or marked. No LLM required.
+2. Audit an LLM's output, see which assertions survive tracing.
 
 ## Layout
 
