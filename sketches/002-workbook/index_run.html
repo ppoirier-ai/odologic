@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Odologic Workbook — variant B</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #faf9f5; --ink: #23211c; --mut: #7d7a6f; --line: #e4e1d7; --card: #ffffff;
+  --theorem: #1f6f54; --observation: #1d5f8a; --assumption: #8a6a1f;
+  --contested: #6a3fa0; --defeated: #a03030; --unaudited: #8a8779;
+}
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: var(--bg); color: var(--ink); line-height: 1.55; font-size: 15px; }
+.wrap { max-width: 760px; margin: 0 auto; padding: 44px 28px 120px; }
+.wordmark { font-size: 12px; letter-spacing: 0.22em; font-weight: 800; color: var(--mut); }
+.wordmark b { color: var(--theorem); }
+h1 { font-size: 30px; font-weight: 750; letter-spacing: -0.015em; margin: 10px 0 6px; }
+.lede { color: var(--mut); font-size: 15.5px; max-width: 56ch; margin-bottom: 34px; }
+.lede b { color: var(--ink); }
+.step { border: 1px solid var(--line); border-radius: 14px; background: var(--card);
+  padding: 26px 28px; margin-bottom: 18px; }
+.step-n { font-size: 11px; font-weight: 800; color: var(--mut); letter-spacing: 0.14em;
+  text-transform: uppercase; margin-bottom: 10px; }
+.step h2 { font-size: 19px; font-weight: 700; margin-bottom: 8px; }
+.step p { color: var(--mut); font-size: 14px; margin-bottom: 14px; }
+textarea { width: 100%; min-height: 130px; border: 1.5px solid var(--line); border-radius: 10px;
+  padding: 14px 16px; font: inherit; font-size: 14.5px; background: #fdfcf9; resize: vertical; }
+textarea:focus { outline: 2px solid var(--theorem); outline-offset: -1px; }
+.btnrow { display: flex; gap: 10px; margin-top: 14px; align-items: center; }
+button.primary { background: var(--theorem); color: #fff; border: none; border-radius: 9px;
+  padding: 10px 22px; font-size: 14.5px; font-weight: 650; cursor: pointer; }
+button.primary:hover { filter: brightness(1.06); }
+button.ghost { background: none; border: 1.5px solid var(--line); color: var(--mut);
+  border-radius: 9px; padding: 10px 18px; font-size: 14px; cursor: pointer; }
+button.ghost:hover { border-color: var(--mut); color: var(--ink); }
+.or { font-size: 12.5px; color: var(--mut); }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+.usecase { font-size: 12.5px; padding: 7px 14px; border: 1.5px solid var(--line);
+  border-radius: 999px; color: var(--ink); cursor: pointer; background: #fdfcf9; }
+.usecase:hover { border-color: var(--theorem); color: var(--theorem); }
+.results { display: none; }
+.verdict-banner { border-radius: 14px; padding: 22px 26px; margin-bottom: 18px;
+  display: flex; align-items: center; gap: 18px; }
+.verdict-banner.bad { background: #f8ece8; border: 1px solid #e3c4bb; }
+.verdict-banner.good { background: #ecf4ef; border: 1px solid #bfd9cb; }
+.verdict-n { font-size: 40px; font-weight: 800; line-height: 1; }
+.verdict-banner.bad .verdict-n { color: var(--defeated); }
+.verdict-banner.good .verdict-n { color: var(--theorem); }
+.verdict-t { font-size: 14px; color: var(--ink); }
+.verdict-t b { font-size: 15.5px; }
+.verdict-t span { color: var(--mut); }
+.claim { border-bottom: 1px solid var(--line); padding: 18px 4px; }
+.claim:last-child { border-bottom: none; }
+.crow { display: flex; align-items: baseline; gap: 12px; }
+.cclaim { font-size: 15.5px; font-weight: 640; }
+.cid { font-family: ui-monospace, monospace; font-size: 11px; color: var(--mut); }
+.chip { font-size: 10px; font-weight: 750; text-transform: uppercase; letter-spacing: 0.07em;
+  border-radius: 999px; padding: 2.5px 10px; color: #fff; flex: 0 0 auto; }
+.cverdict { font-size: 13.5px; color: var(--mut); margin: 5px 0 0; }
+.cexp { font-size: 13px; color: var(--ink); margin: 9px 0 0; padding-left: 14px;
+  border-left: 2.5px solid var(--line); }
+.cexp b { font-weight: 650; }
+.cexp .k { font-family: ui-monospace, monospace; font-size: 11.5px; color: var(--mut); }
+.ctrace { font-size: 12.5px; margin-top: 8px; padding-left: 14px; font-family: ui-monospace, monospace; }
+.ctrace .ok { color: var(--theorem); font-weight: 650; }
+.ctrace .bad { color: var(--defeated); font-weight: 650; }
+.ctrace .dim { color: var(--mut); }
+.reply { margin-top: 6px; font-size: 12.5px; color: var(--theorem); font-weight: 650;
+  cursor: pointer; }
+.reply:hover { text-decoration: underline; }
+.expand { display: none; margin-top: 8px; font-size: 13px; color: var(--ink);
+  background: #f4f3ee; border-radius: 8px; padding: 10px 14px; }
+.footer { margin-top: 44px; font-size: 12.5px; color: var(--mut); border-top: 1px solid var(--line);
+  padding-top: 18px; max-width: 60ch; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="wordmark">ODO<b>LOGIC</b></div>
+  <h1>Does it hold?</h1>
+  <p class="lede">Paste any text, or an AI's answer. Every claim gets traced down to first
+  principles, or it gets marked. <b>Nothing stands on fluency alone.</b></p>
+
+  <div class="step">
+    <div class="step-n">Step 1 — paste</div>
+    <h2>Your text</h2>
+    <p>Try the teleport line an LLM might produce, or a real product label.</p>
+    <textarea id="input" spellcheck="false" placeholder="Paste text or an LLM answer…"></textarea>
+    <div class="btnrow">
+      <button class="primary" onclick="run()">Trace it</button>
+      <span class="or">or try:</span>
+      <span class="usecase" onclick="load('llm')">LLM teleport claim</span>
+      <span class="usecase" onclick="load('label')">Omega-3 label</span>
+    </div>
+  </div>
+
+  <div class="results" id="results">
+    <div class="step">
+      <div class="step-n">Step 2 — the verdict</div>
+      <div class="verdict-banner bad" id="banner">
+        <div class="verdict-n" id="bn">1</div>
+        <div class="verdict-t" id="bt"></div>
+      </div>
+      <div id="claims"></div>
+    </div>
+
+    <div class="step">
+      <div class="step-n">Step 3 — what you can do</div>
+      <p id="dos"></p>
+    </div>
+  </div>
+
+  <div class="footer">Odologic is a judgment ledger: every claim carries its evidence, and every
+  standing claim traces to a floor of first principles. Defeated claims are kept forever as hard
+  negatives. Mockup, fixtures only, no engine behind this yet.</div>
+</div>
+<script>
+const CHIPC = { theorem:"#1f6f54", observation:"#1d5f8a", assumption:"#8a6a1f",
+  contested:"#6a3fa0", defeated:"#a03030", unaudited:"#8a8779" };
+const CASES = {
+  llm: {
+    text: "Yesterday I teleported in an instant from Japan to New York. I was in Tokyo at 13:00 JST and in New York at 13:05 JST the same day. It was effortless.",
+    bn: "1", bad: true,
+    bt: "<b>claim defeated, 2 stand.</b><br><span>One claim traces only to testimony and is contradicted by a floor theorem. The rest of the passage survives.</span>",
+    claims: [
+      { id:"J1", status:"defeated", claim:"Person X teleported instantaneously from Japan to New York",
+        v:"Defeated: testimony can't lift it, and a floor theorem contradicts it.",
+        exp:"Evidence <span class='k'>C1</span> is <b>testimony with no protocol</b>, which cannot ground a first-order physical claim.",
+        trace:'<span class="bad">J1 · defeated · no path to floor</span><br><span class="dim">undercut: C1 insufficient · rebut: J3 (energy/FTL)</span>',
+        why:"Floor theorems J3/J4 derive from energy conservation and special relativity: instantaneous macroscopic relocation is excluded. J2, the flight, is grounded by airline records and stands." },
+      { id:"J2", status:"observation", claim:"Person X flew Tokyo to New York on flight JL 004",
+        v:"Stands: grounded by records with a replayable protocol.",
+        exp:"Evidence <span class='k'>C2</span>: border and airline records, logged protocol.",
+        trace:'<span class="ok">J2 · grounded · 1 hop to floor</span>',
+        why:"Immigration timestamps and the flight manifest are replayable measurements, so the claim holds as an observation." },
+    ],
+    dos: "Flag the defeated claim as a hard negative for model training. Ask the model's operator for the provenance of 'teleported'. Keep the ledger event: it is permanent and auditable."
+  },
+  label: {
+    text: "Omega-3 Supreme. Natural anti-inflammatory. 1200 mg fish oil per softgel. Supports heart health. 60 softgels. Mercury tested. Manufactured in a cGMP facility.",
+    bn: "5", bad: false,
+    bt: "<b>claims grounded, 1 defeated, 1 held as assumption.</b><br><span>The measurable claims check out. 'Supports heart health' is prohibited by an FDA warning letter.</span>",
+    claims: [
+      { id:"L1", status:"observation", claim:"Contains 1200 mg fish oil per softgel",
+        v:"Stands: certificate of analysis, replayable.",
+        exp:"Evidence <span class='k'>L-C1</span>: batch CoA countersigned by an ISO 17025 lab.",
+        trace:'<span class="ok">L1 · grounded · 1 hop to floor</span>',
+        why:"A measurement with a logged protocol qualifies as a certificate under the floor rules." },
+      { id:"L4", status:"assumption", claim:"Natural anti-inflammatory",
+        v:"Held as assumption: marketing language, no measurement behind it.",
+        exp:"Evidence <span class='k'>L-C4</span> is <b>testimony</b> (the label's own assertion), which cannot ground the claim.",
+        trace:'<span class="dim">L4 · held as labeled assumption · not used downstream</span>',
+        why:"Odologic never drops your claim silently: it keeps it, labeled, so downstream systems know it is unproven rather than mistaking it for established." },
+      { id:"L5", status:"defeated", claim:"Supports heart health",
+        v:"Defeated: FDA warning letter 2019-0812 is a standing contradiction.",
+        exp:"Evidence <span class='k'>L-C5</span> is testimony, and an external <b>rebut</b> exists.",
+        trace:'<span class="bad">L5 · defeated</span><br><span class="dim">rebut: FDA 2019-0812 · unapproved health claim</span>',
+        why:"The FDA letter prohibits this claim on supplement labels unless it meets a qualified health claim standard, which this product does not." },
+      { id:"L6", status:"theorem", claim:"Omega-3 supplementation reduces major cardiovascular events",
+        v:"Floor theorem: Cochrane review of 86 RCTs, kernel-checked.",
+        exp:"Evidence <span class='k'>L-C6</span>: systematic review; each included study is a certificate.",
+        trace:'<span class="ok">FLOOR · depth 0</span>',
+        why:"This is the medical floor the defeated claim should have been measured against." },
+    ],
+    dos: "Export the grounded set for your comparison page. Hold 'natural anti-inflammatory' as an assumption pending evidence. Send the FDA defeat to the producer's compliance contact."
+  },
+};
+function chip(s){ return `<span class="chip" style="background:${CHIPC[s]}">${s}</span>`; }
+function load(k){ document.getElementById("input").value = CASES[k].text; run(); }
+function run(){
+  const t = document.getElementById("input").value.toLowerCase();
+  let c = CASES.llm;
+  if (t.includes("omega") || t.includes("softgel")) c = CASES.label;
+  const r = document.getElementById("results");
+  r.style.display = "block";
+  document.getElementById("banner").className = "verdict-banner " + (c.bad ? "bad" : "good");
+  document.getElementById("bn").textContent = c.bn;
+  document.getElementById("bt").innerHTML = c.bt;
+  document.getElementById("claims").innerHTML = c.claims.map(x=>`
+    <div class="claim">
+      <div class="crow"><span class="cid">${x.id}</span><span class="cclaim">${x.claim}</span>${chip(x.status)}</div>
+      <p class="cverdict">${x.v}</p>
+      <div class="cexp">${x.exp}</div>
+      <div class="ctrace">${x.trace}</div>
+      <div class="reply" onclick="this.nextElementSibling.style.display='block';this.style.display='none'">why?</div>
+      <div class="expand">${x.why}</div>
+    </div>`).join("");
+  document.getElementById("dos").innerHTML = c.dos;
+  r.scrollIntoView({ behavior:"smooth" });
+}
+const q=new URLSearchParams(location.search);if(q.get('run')){load(q.get('run'));}
+</script>
+</body>
+</html>

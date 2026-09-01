@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Odologic Analyzer — variant A</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #131312; --panel: #1b1b19; --panel2: #222220; --line: #333330;
+  --fg: #e8e6df; --mut: #8f8c82; --faint: #5c5a52;
+  --theorem: #2f9e78; --observation: #3f8fc4; --assumption: #c9a24b;
+  --contested: #9d6fd0; --defeated: #cf4d4d; --unaudited: #8f8c82;
+}
+body { font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg); color: var(--fg); font-size: 14px; line-height: 1.5; height: 100vh;
+  display: flex; flex-direction: column; overflow: hidden; }
+.topbar { display: flex; align-items: center; gap: 14px; padding: 9px 16px;
+  border-bottom: 1px solid var(--line); background: var(--panel); flex: 0 0 auto; }
+.logo { font-weight: 800; letter-spacing: 0.14em; font-size: 13px; color: var(--fg); }
+.logo b { color: var(--theorem); }
+.crumbs { color: var(--mut); font-size: 12.5px; }
+.tabs { display: flex; gap: 4px; margin-left: auto; }
+.tab { padding: 5px 14px; border-radius: 7px; font-size: 12.5px; color: var(--mut); cursor: pointer; }
+.tab:hover { background: var(--panel2); color: var(--fg); }
+.tab.active { background: var(--panel2); color: var(--fg); font-weight: 650; }
+.ws { font-family: ui-monospace, monospace; font-size: 11.5px; color: var(--faint);
+  border: 1px solid var(--line); padding: 3px 9px; border-radius: 6px; }
+.cols { display: grid; grid-template-columns: 340px 1fr 300px; flex: 1 1 auto; overflow: hidden; }
+.pane { overflow-y: auto; padding: 16px; }
+.pane.src { border-right: 1px solid var(--line); background: var(--panel); }
+.pane.ins { border-left: 1px solid var(--line); background: var(--panel); }
+.pane-h { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.1em;
+  color: var(--faint); margin-bottom: 10px; }
+.src-doc { background: var(--panel2); border: 1px solid var(--line); border-radius: 9px;
+  padding: 14px 16px; font-family: Georgia, serif; font-size: 14px; color: var(--fg);
+  white-space: pre-wrap; }
+.src-doc mark { background: #3a3a1e; color: #e8d98a; border-radius: 3px; padding: 0 2px; }
+.src-doc mark.bad { background: #40201f; color: #e58f8f; }
+.src-meta { margin-top: 12px; font-size: 12px; color: var(--mut); }
+.src-meta b { color: var(--fg); font-weight: 600; }
+.filters { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+.fchip { font-size: 11px; padding: 3px 10px; border-radius: 999px; border: 1px solid var(--line);
+  color: var(--mut); cursor: pointer; }
+.fchip:hover { color: var(--fg); border-color: var(--faint); }
+.fchip.on { border-color: var(--theorem); color: var(--theorem); }
+.stats { display: flex; gap: 16px; margin-bottom: 14px; }
+.stat { display: flex; align-items: baseline; gap: 5px; }
+.stat-n { font-size: 19px; font-weight: 750; }
+.stat-l { font-size: 10.5px; color: var(--mut); text-transform: uppercase; letter-spacing: 0.05em; }
+.jcard { background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+  padding: 13px 15px; margin-bottom: 12px; }
+.jcard.defeated { border-color: #5a3030; background: #221918; }
+.jhead { display: flex; align-items: center; gap: 8px; }
+.jid { font-family: ui-monospace, monospace; font-size: 11px; color: var(--faint); }
+.chip { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em;
+  border-radius: 999px; padding: 2px 8px; color: #0f0f0e; }
+.chip.theorem { background: var(--theorem); }
+.chip.observation { background: var(--observation); }
+.chip.assumption { background: var(--assumption); }
+.chip.defeated { background: var(--defeated); color: #fff; }
+.jact { margin-left: auto; display: flex; gap: 6px; }
+.jbtn { font-size: 11px; color: var(--mut); border: 1px solid var(--line); border-radius: 6px;
+  padding: 2px 8px; cursor: pointer; }
+.jbtn:hover { color: var(--fg); border-color: var(--faint); }
+.jbtn.warn { color: #e58f8f; border-color: #5a3030; }
+.jclaim { font-size: 14.5px; font-weight: 620; margin: 7px 0 3px; }
+.jverdict { font-size: 12.5px; color: var(--mut); margin-bottom: 10px; }
+.subpanel { border-top: 1px dashed var(--line); margin-top: 9px; padding-top: 8px; }
+.sub-h { font-size: 10px; text-transform: uppercase; letter-spacing: 0.09em; color: var(--faint);
+  margin-bottom: 6px; }
+.cert { border-left: 3px solid var(--theorem); padding: 5px 10px; background: #1a241f;
+  border-radius: 0 6px 6px 0; }
+.cert.insuf { border-left-color: var(--defeated); background: #241a19; }
+.cert-t { font-size: 12px; }
+.cert-t b { font-family: ui-monospace, monospace; font-weight: 500; color: var(--mut); font-size: 11px; }
+.badge { font-size: 9.5px; font-weight: 700; text-transform: uppercase; padding: 1px 6px;
+  border-radius: 999px; letter-spacing: 0.05em; }
+.badge.ok { background: var(--theorem); color: #0f0f0e; }
+.badge.no { background: var(--defeated); color: #fff; }
+.cert-d { font-size: 12px; color: var(--mut); margin-top: 2px; }
+.trace { font-family: ui-monospace, monospace; font-size: 12px; color: var(--mut); }
+.trace .ok { color: var(--theorem); font-weight: 600; }
+.trace .bad { color: var(--defeated); font-weight: 600; }
+.trace .depth { color: var(--faint); }
+.dline { font-size: 12px; margin-bottom: 2px; }
+.dline b { color: var(--defeated); font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.06em; }
+.dline .tgt { font-family: ui-monospace, monospace; color: var(--mut); font-size: 11px; }
+.ins-block { background: var(--panel2); border: 1px solid var(--line); border-radius: 9px;
+  padding: 11px 12px; margin-bottom: 12px; }
+.ins-t { font-size: 12.5px; font-weight: 650; margin-bottom: 4px; }
+.ins-v { font-size: 12px; color: var(--mut); }
+.ins-v b { color: var(--fg); }
+.evt { font-family: ui-monospace, monospace; font-size: 11px; color: var(--mut); padding: 3px 0;
+  border-bottom: 1px dotted var(--line); display: flex; gap: 8px; }
+.evt:last-child { border-bottom: none; }
+.evt .h { color: var(--faint); }
+.rep-bar { display: flex; gap: 3px; margin-top: 6px; }
+.rep-cell { height: 8px; flex: 1; background: var(--line); border-radius: 2px; }
+.rep-cell.d { background: var(--defeated); }
+.rep-cell.s { background: var(--theorem); }
+.actions .jbtn { display: block; margin-bottom: 6px; text-align: left; width: 100%;
+  white-space: normal; line-height: 1.35; }
+.hint { font-size: 11.5px; color: var(--faint); margin-top: 8px; line-height: 1.45; }
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="logo">ODO<b>LOGIC</b></div>
+  <div class="crumbs">Audit workspace / <span id="crumb">LLM output audit</span></div>
+  <div class="tabs">
+    <div class="tab active" data-doc="llm">LLM audit</div>
+    <div class="tab" data-doc="label">Document grounding</div>
+  </div>
+  <div class="ws">worldsheet: <span id="wsname">teleport-demo @ a41f…c02</span></div>
+</div>
+<div class="cols">
+  <div class="pane src">
+    <div class="pane-h">Source</div>
+    <div class="src-doc" id="srcdoc"></div>
+    <div class="src-meta" id="srcmeta"></div>
+    <div class="pane-h" style="margin-top:20px">Status legend</div>
+    <div class="stats" id="legend" style="flex-direction:column; gap:7px"></div>
+  </div>
+  <div class="pane mid">
+    <div class="filters" id="filters"></div>
+    <div class="stats" id="stats"></div>
+    <div id="jlist"></div>
+  </div>
+  <div class="pane ins">
+    <div class="pane-h">Ledger inspector</div>
+    <div class="ins-block">
+      <div class="ins-t">Reputation · source</div>
+      <div class="ins-v" id="rep"></div>
+      <div class="rep-bar" id="repbar"></div>
+    </div>
+    <div class="ins-block">
+      <div class="ins-t">Suggested actions</div>
+      <div class="actions" id="actions"></div>
+    </div>
+    <div class="pane-h">Event stream</div>
+    <div id="events"></div>
+    <div class="hint">Every assertion, certificate, defeat, and status change is an append-only
+    hash-chained event. Any worldsheet can be replayed.</div>
+  </div>
+</div>
+<script>
+const DOCS = {
+  llm: {
+    crumb: "LLM output audit", ws: "teleport-demo @ a41f…c02",
+    src: "Yesterday I <mark class='bad'>teleported in an instant from Japan to New York</mark>. I was in Tokyo at 13:00 JST and in New York at 13:05 JST the same day. It was effortless.",
+    meta: "<b>claude-4.6-sonnet</b> (simulated) · 1 extracted claim · 2 floor theorems invoked",
+    rep: "Person X (claimant) — <b>defeated/standing 1/0</b>. Future testimony weighs less automatically.",
+    repbar: [["d"]],
+    events: [
+      ["ev-009", "assert J1 ← claude-4.6-sonnet"],
+      ["ev-010", "certificate C1 attached (testimony)"],
+      ["ev-011", "defeat D1 · undercut → C1"],
+      ["ev-012", "defeat D2 · rebut → J1 (via J3)"],
+      ["ev-013", "status J1: unaudited → defeated"],
+      ["ev-014", "reputation resolve: person X"],
+    ],
+    actions: [
+      ["Flag J1 to hard-negative set", "warn"],
+      ["Request certificate for J2", ""],
+    ],
+    stats: [["2","theorem","#2f9e78"],["1","observation","#3f8fc4"],["1","defeated","#cf4d4d"]],
+    js: [
+      { id:"J1", status:"defeated", cls:"defeated", claim:"Person X teleported instantaneously from Japan to New York",
+        verdict:"DEFEATED. Fluent, plausible, provably false. Traces to testimony alone, which cannot lift it off the floor.",
+        cert:["C1","testimony","no","Unaudited claimant testimony. No protocol. Bare testimony cannot lift a first-order physical claim."],
+        trace:["bad","J1 · defeated · no path to floor","&nbsp;&nbsp;└ floor J4 unreachable: C1 insufficient"],
+        defeats:[["undercut","→ C1","Testimony alone cannot lift J1 off the floor","Bare testimony does not qualify as evidence for a first-order physical claim."],
+                 ["rebut","→ J1","J3 contradicts J1: stellar-scale energy or FTL required, both excluded by the floor","J3 (standing floor theorem) and J1 cannot both be true. J3 is certified, J1 is not."]] },
+      { id:"J2", status:"observation", claim:"Person X flew Tokyo to New York on flight JL 004",
+        verdict:"STANDS. Grounded by border and airline records with a logged, replayable protocol.",
+        cert:["C2","measurement","ok","Border and airline records, logged protocol, replayable."],
+        trace:["ok","J2 · holds as observation · grounded 1 hop from floor",""] },
+      { id:"J3", status:"theorem", claim:"Event E requires stellar-scale energy or an FTL channel",
+        verdict:"FLOOR theorem. Certified by kernel-checked derivation from special relativity.",
+        cert:["C3","derivation","ok","Symbolic derivation from labeled axioms SR-1, SR-2. Kernel verified each step."],
+        trace:["ok","FLOOR · depth 1","&nbsp;&nbsp;└ depends_on J4"] },
+      { id:"J4", status:"theorem", claim:"Macroscopic matter cannot relocate instantaneously",
+        verdict:"FLOOR axiom-level theorem. Energy conservation and special relativity exclude it.",
+        cert:["C3","derivation","ok","Kernel-checked derivation from labeled axioms."],
+        trace:["ok","FLOOR · depth 0",""] },
+    ],
+  },
+  label: {
+    crumb: "Document grounding", ws: "label-demo @ 7b22…e91",
+    src: "Omega-3 Supreme. <mark class='bad'>Natural anti-inflammatory.</mark> 1200 mg fish oil per softgel. <mark class='bad'>Supports heart health.</mark> 60 softgels. Mercury tested. Manufactured in a cGMP facility.",
+    meta: "<b>Omega-3 Supreme label</b> · pasted by user · 6 extracted claims · no LLM in the loop",
+    rep: "Omega-3 Supreme (producer-authored doc) — <b>2 of 6 claims lack working certificates</b>. Marketing claims auto-hold as assumptions; medical claims defeat.",
+    repbar: [["s","s","s","d","d","s"]],
+    events: [
+      ["ev-101", "ingest document ← user paste"],
+      ["ev-102", "extract 6 candidate judgments"],
+      ["ev-103", "certificates C-L1..C-L3 verified"],
+      ["ev-104", "defeat L-D1 · rebut → L5 (FDA 2019-0812)"],
+      ["ev-105", "status L5: unaudited → defeated"],
+      ["ev-106", "hold L4 as labeled assumption"],
+    ],
+    actions: [
+      ["Defeat 'supports heart health'", "warn"],
+      ["Hold 'natural anti-inflammatory' as assumption", ""],
+    ],
+    stats: [["1","theorem","#2f9e78"],["3","observation","#3f8fc4"],["1","assumption","#c9a24b"],["1","defeated","#cf4d4d"]],
+    js: [
+      { id:"L1", status:"observation", claim:"Contains 1200 mg fish oil per softgel",
+        verdict:"STANDS. Certificate of analysis, a measurement with a logged, replayable protocol.",
+        cert:["L-C1","measurement","ok","CoA batch 24C-108, countersigned by an ISO 17025 lab."],
+        trace:["ok","L1 · holds as observation",""] },
+      { id:"L2", status:"observation", claim:"Mercury tested",
+        verdict:"STANDS. Third-party lab assay, batch-specific, replayable.",
+        cert:["L-C2","measurement","ok","ICP-MS heavy metal assay with detection limit recorded."],
+        trace:["ok","L2 · holds as observation",""] },
+      { id:"L3", status:"observation", claim:"Manufactured in a cGMP facility",
+        verdict:"STANDS. FDA registration and inspection record. Public, retrievable.",
+        cert:["L-C3","structural","ok","FDA facility registration + last inspection record."],
+        trace:["ok","L3 · holds as observation",""] },
+      { id:"L4", status:"assumption", claim:"Natural anti-inflammatory",
+        verdict:"HELD AS ASSUMPTION. Marketing claim, not a measurement. Stands only because it is explicitly labeled.",
+        cert:["L-C4","testimony","no","No measurement, no protocol, no citation. Cannot lift off the floor; held as labeled assumption."],
+        trace:["","L4 · held as assumption · labeled","&nbsp;&nbsp;└ not used in downstream derivations"],
+        defeats:[] },
+      { id:"L5", status:"defeated", cls:"defeated", claim:"Supports heart health",
+        verdict:"DEFEATED. FDA letter 2019-0812 is a standing contradiction.",
+        cert:["L-C5","testimony","no","Producer's marketing assertion with no measurement or citation."],
+        trace:["bad","L5 · defeated · no path to floor",""],
+        defeats:[["rebut","→ L5","FDA warning letter 2019-0812 prohibits 'supports heart health' as an unapproved health claim","The claim is prohibited on supplement labels unless it meets a qualified health claim standard, which this product does not."]] },
+      { id:"L6", status:"theorem", claim:"Omega-3 supplementation reduces major adverse cardiovascular events",
+        verdict:"FLOOR theorem. Cochrane review of 86 RCTs. Kernel-checked derivation from included study data.",
+        cert:["L-C6","derivation","ok","Cochrane systematic review; each included study is a certificate in the ledger."],
+        trace:["ok","FLOOR · depth 0",""] },
+    ],
+  },
+};
+const LEGEND = [
+  ["theorem","kernel-certified derivation from the floor"],
+  ["observation","grounded by replayable measurement"],
+  ["assumption","explicitly labeled, used but not proven"],
+  ["contested","standing defeat against it, unresolved"],
+  ["defeated","a defeat has landed and is final"],
+  ["unaudited","no certificate, no path to the floor"],
+];
+function chip(s){ const map={theorem:"#2f9e78",observation:"#3f8fc4",assumption:"#c9a24b",contested:"#9d6fd0",defeated:"#cf4d4d",unaudited:"#8f8c82"};
+  return `<span class="chip ${s}" style="background:${map[s]}">${s}</span>`; }
+function renderDoc(key){
+  const d = DOCS[key];
+  document.getElementById("crumb").textContent = d.crumb;
+  document.getElementById("wsname").textContent = d.ws;
+  document.getElementById("srcdoc").innerHTML = d.src;
+  document.getElementById("srcmeta").innerHTML = d.meta;
+  document.getElementById("rep").innerHTML = d.rep;
+  document.getElementById("repbar").innerHTML =
+    d.repbar.flat().map(c=>`<div class="rep-cell ${c==='d'?'d':'s'}"></div>`).join("");
+  document.getElementById("actions").innerHTML =
+    d.actions.map(([t,w])=>`<button class="jbtn ${w}">${t}</button>`).join("");
+  document.getElementById("events").innerHTML =
+    d.events.map(([h,t])=>`<div class="evt"><span class="h">${h}</span>${t}</div>`).join("");
+  document.getElementById("stats").innerHTML =
+    d.stats.map(([n,l,c])=>`<div class="stat"><span class="stat-n" style="color:${c}">${n}</span><span class="stat-l">${l}</span></div>`).join("");
+  document.getElementById("filters").innerHTML =
+    ["all","theorem","observation","assumption","contested","defeated","unaudited"]
+    .map((f,i)=>`<div class="fchip ${i===0?'on':''}" data-f="${f}">${f}</div>`).join("");
+  document.getElementById("legend").innerHTML =
+    LEGEND.map(([s,t])=>`<div class="stat"><span>${chip(s)}</span><span class="stat-l" style="text-transform:none">${t}</span></div>`).join("");
+  document.getElementById("jlist").innerHTML = d.js.map(j=>`
+    <div class="jcard ${j.cls||''}" data-status="${j.status}">
+      <div class="jhead"><span class="jid">${j.id}</span>${chip(j.status)}
+        <div class="jact"><button class="jbtn">inspect</button><button class="jbtn">cite</button></div></div>
+      <div class="jclaim">${j.claim}</div>
+      <div class="jverdict">${j.verdict}</div>
+      <div class="subpanel"><div class="sub-h">Evidence</div>
+        <div class="cert ${j.cert[2]==='ok'?'':'insuf'}"><div class="cert-t">
+          <b>${j.cert[0]}</b> ${j.cert[1]} <span class="badge ${j.cert[2]}">${j.cert[2]==='ok'?'suffices':'insufficient'}</span></div>
+        <div class="cert-d">${j.cert[3]}</div></div></div>
+      <div class="subpanel"><div class="sub-h">Trace to floor</div>
+        <div class="trace"><div class="${j.trace[0]}">${j.trace[1]}</div>${j.trace[2]?`<div class="depth">${j.trace[2]}</div>`:""}</div></div>
+      ${j.defeats&&j.defeats.length?`<div class="subpanel"><div class="sub-h">Defeats</div>
+        ${j.defeats.map(x=>`<div class="dline"><b>${x[0]}</b> <span class="tgt">${x[1]}</span> ${x[2]}</div><div class="cert-d">${x[3]}</div>`).join("")}</div>`:""}
+    </div>`).join("");
+}
+document.querySelectorAll(".tab").forEach(t=>{
+  t.addEventListener("click",()=>{
+    document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+    t.classList.add("active"); renderDoc(t.dataset.doc);
+  });
+});
+document.body.addEventListener("click",e=>{
+  if(e.target.classList.contains("fchip")){
+    document.querySelectorAll(".fchip").forEach(f=>f.classList.remove("on"));
+    e.target.classList.add("on");
+    const f = e.target.dataset.f;
+    document.querySelectorAll(".jcard").forEach(c=>{
+      c.style.display = (f==="all"||c.dataset.status===f)?"":"none";
+    });
+  }
+});
+renderDoc("llm");
+</script>
+</body>
+</html>

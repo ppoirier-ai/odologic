@@ -1,0 +1,164 @@
+{
+  "worldsheet": "label-demo",
+  "scenario": "Document grounding, no LLM",
+  "source_kind": "text_document",
+  "source_name": "Omega-3 supplement label (typed by user)",
+  "input_text": "Omega-3 Supreme. Natural anti-inflammatory. 1200 mg fish oil per softgel. Supports heart health. 60 softgels. Mercury tested. Manufactured in a cGMP facility.",
+  "task_line": "Grounding 6 claims extracted from a pasted document",
+  "subtitle": "3 grounded, 1 assumption, 2 ungrounded. Floor trace depth 2.",
+  "judgments": [
+    {
+      "id": "L1",
+      "claim": "Contains 1200 mg fish oil per softgel",
+      "type": "observation",
+      "status": "observation",
+      "terms": ["L-T1"],
+      "certificate": "L-C1",
+      "defeats": [],
+      "verdict_line": "STANDS. Grounded by certificate of analysis, a measurement with a logged, replayable protocol."
+    },
+    {
+      "id": "L2",
+      "claim": "Mercury tested",
+      "type": "observation",
+      "status": "observation",
+      "terms": ["L-T2"],
+      "certificate": "L-C2",
+      "defeats": [],
+      "verdict_line": "STANDS. Third-party lab assay, batch-specific, replayable."
+    },
+    {
+      "id": "L3",
+      "claim": "Manufactured in a cGMP facility",
+      "type": "observation",
+      "status": "observation",
+      "terms": ["L-T3"],
+      "certificate": "L-C3",
+      "defeats": [],
+      "verdict_line": "STANDS. FDA registration and inspection record. Structural, retrievable, public."
+    },
+    {
+      "id": "L4",
+      "claim": "Natural anti-inflammatory",
+      "type": "assumption",
+      "status": "assumption",
+      "terms": ["L-T4"],
+      "certificate": "L-C4",
+      "defeats": [],
+      "verdict_line": "HELD AS ASSUMPTION. Structure notes that 'natural anti-inflammatory' is a marketing claim, not a measurement. It stands only because it is explicitly labeled."
+    },
+    {
+      "id": "L5",
+      "claim": "Supports heart health",
+      "type": "health claim",
+      "status": "defeated",
+      "terms": ["L-T5"],
+      "certificate": "L-C5",
+      "defeats": ["L-D1"],
+      "verdict_line": "DEFEATED. FDA letter 2019-0812 is a standing contradiction."
+    },
+    {
+      "id": "L6",
+      "claim": "Omega-3 supplementation reduces major adverse cardiovascular events",
+      "type": "review",
+      "status": "theorem",
+      "terms": ["L-T5"],
+      "certificate": "L-C6",
+      "defeats": [],
+      "verdict_line": "FLOOR theorem. Cochrane review of 86 RCTs. Kernel-checked derivation from included study data."
+    }
+  ],
+  "terms": [
+    { "id": "L-T1", "name": "Fish oil content per softgel", "kind": "product attribute" },
+    { "natural": "placeholder", "anti": "placeholder", "id": "L-T4", "name": "Anti-inflammatory property", "kind": "health effect, contested class" },
+    { "id": "L-T2", "name": "Mercury contamination of fish oil", "kind": "safety attribute" },
+    { "id": "L-T3", "name": "Manufacturing facility compliance", "kind": "structural attribute" },
+    { "id": "L-T5", "name": "Omega-3 and cardiovascular outcomes", "kind": "medical claim class" }
+  ],
+  "certificates": [
+    {
+      "id": "L-C1",
+      "type": "measurement",
+      "summary": "Certificate of analysis, batch 24C-108",
+      "suffices": true,
+      "detail": "The producer's own CoA, countersigned by an ISO 17025 lab. Both weight and EPA/DHA breakdown recorded. Protocol logged."
+    },
+    {
+      "id": "L-C2",
+      "type": "measurement",
+      "summary": "Third-party heavy metal assay, batch 24C-108",
+      "suffices": true,
+      "detail": "Independent lab report, batch-specific, with the assay method (ICP-MS) and detection limit recorded. Replayable."
+    },
+    {
+      "id": "L-C3",
+      "type": "structural",
+      "summary": "FDA facility registration + last inspection record",
+      "suffices": true,
+      "detail": "The facility is registered with the FDA and passed its most recent cGMP inspection. Public record, retrievable."
+    },
+    {
+      "id": "L-C4",
+      "type": "testimony",
+      "summary": "Producer's marketing assertion, no measurement",
+      "suffices": false,
+      "detail": "The label asserts 'natural anti-inflammatory' but presents no measurement, no protocol, no citation. As testimony it cannot lift the claim off the floor, so the judgment is held as an explicitly labeled assumption rather than dropped or defeated."
+    },
+    {
+      "id": "L-C5",
+      "type": "testimony",
+      "summary": "Producer's marketing assertion",
+      "suffices": false,
+      "detail": "The label asserts 'supports heart health' with no measurement or citation."
+    },
+    {
+      "id": "L-C6",
+      "kind": "note",
+      "type": "derivation",
+      "summary": "Cochrane review, 86 RCTs, kernel-checked",
+      "suffices": true,
+      "detail": "Cochrane systematic review of omega-3 supplementation and cardiovascular outcomes, 86 RCTs. Each included study is a certificate in the ledger. The kernel verified the derivation from included study data."
+    }
+  ],
+  "defeats": [
+    {
+      "id": "L-D1",
+      "type": "rebut",
+      "target": "L5",
+      "target_kind": "judgment",
+      "claim": "FDA warning letter 2019-0812 prohibits 'supports heart health' as an unapproved health claim",
+      "detail": "The FDA letter is a standing contradiction: the claim is prohibited on supplements labels unless it meets a qualified health claim standard, which this product does not. The rebut lands on L5 and it is defeated."
+    }
+  ],
+  "depends_on": {
+    "L1": [],
+    "L2": [],
+    "L3": [],
+    "L4": [],
+    "L5": [],
+    "L6": []
+  },
+  "reputation": {
+    "source": "Omega-3 Supreme label (producer-authored document)",
+    "before": "neutral",
+    "after": "2 of 6 authored claims lack working certificates. Marketing claims auto-hold as assumptions; medical claims defeat.",
+    "note": "Document as source: the label itself is a source node with a derived reputation from its claim resolution history."
+  },
+  "suggested_actions": [
+    { "id": "A1", "action": "Hold 'natural anti-inflammatory' as assumption pending evidence", "detail": "Label explicitly as assumption so downstream systems treat it as unproven." },
+    { "downstream": "note", "systems": "note", "treat": "note", "id": "A2", "action": "Defeat 'supports heart health'", "detail": "FDA letter is a standing contradiction; flag for hard-negative training." }
+  ],
+  "status_legend": {
+    "theorem": "kernel-certified derivation from the floor",
+    "statement_kind": "producer-authored marketing claims",
+    "observation": "grounded by replayable measurement",
+    "assumption": "explicitly labeled, used but not proven",
+    "contested": "standing defeat against it, unresolved",
+    "defeated": "a defeat has landed and is final",
+    "unaudited": "no certificate, no path to the floor"
+  },
+  "notes": [
+    "Hand-built fixture. A real closer would derive status, cascade, and reputation.",
+    "The label example demonstrates the pure document path: no LLM in the loop, the user pastes text, the system extracts claims, grounds them, and shows which stand."
+  ]
+}

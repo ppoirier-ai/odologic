@@ -1,0 +1,128 @@
+{
+  "worldsheet": "teleport-demo",
+  "scenario": "LLM audit",
+  "source_kind": "llm_output",
+  "source_name": "claude-4.6-sonnet (simulated)",
+  "input_text": "Yesterday I teleported in an instant from Japan to New York. I was in Tokyo at 13:00 JST and in New York at 13:05 JST the same day. It was effortless.",
+  "task_line": "Auditing 1 extracted claim from model output",
+  "subtitle": "2 floor theorems, 2 certificates, 2 defeats, reputation decay on source",
+  "judgments": [
+    {
+      "id": "J1",
+      "claim": "Person X teleported instantaneously from Japan to New York",
+      "type": "observation",
+      "status": "defeated",
+      "confidence": 0.87,
+      "terms": ["T2"],
+      "certificate": "C1",
+      "defeats": ["D1", "D2"],
+      "verdict_line": "DEFEATED. Fluent, plausible, provably false. Traces to testimony alone, which cannot lift it off the floor."
+    },
+    {
+      "id": "J2",
+      "claim": "Person X flew Tokyo to New York on flight JL 004",
+      "type": "observation",
+      "status": "observation",
+      "confidence": 0.94,
+      "terms": ["T2"],
+      "certificate": "C2",
+      "defeats": [],
+      "verdict_line": "STANDS. Grounded by border and airline records with a logged, replayable protocol."
+    },
+    {
+      "id": "J3",
+      "claim": "Event E requires stellar-scale energy or an FTL channel",
+      "type": "theorem",
+      "status": "theorem",
+      "confidence": 1.0,
+      "terms": ["T1", "T2"],
+      "certificate": "C3",
+      "defeats": [],
+      "verdict_line": "FLOOR theorem. Certified by kernel-checked derivation from special relativity."
+    },
+    {
+      "id": "J4",
+      "claim": "Macroscopic matter cannot relocate instantaneously",
+      "type": "theorem",
+      "status": "theorem",
+      "confidence": 1.0,
+      "terms": ["T1"],
+      "certificate": "C3",
+      "defeats": [],
+      "verdict_line": "FLOOR axiom-level theorem. Energy conservation and special relativity exclude instantaneous macroscopic relocation."
+    }
+  ],
+  "terms": [
+    { "id": "T1", "name": "Energy conservation / special relativity", "kind": "physics floor" },
+    { "id": "T2", "name": "Event E: person X in Tokyo 13:00 JST and New York 13:05 JST", "kind": "event" }
+  ],
+  "certificates": [
+    {
+      "id": "C1",
+      "type": "testimony",
+      "summary": "Unaudited claimant testimony. No protocol.",
+      "suffices": false,
+      "detail": "Bare testimony does not qualify as evidence for a first-order claim about the physical world. It cannot lift J1 off the floor."
+    },
+    {
+      "id": "C2",
+      "type": "measurement",
+      "summary": "Border and airline records, logged protocol, replayable",
+      "suffices": true,
+      "detail": "Immigration timestamps and the JL 004 manifest for that date. Acquisition protocol logged and replayable: any agent can re-derive the timestamps from the record set."
+    },
+    {
+      "id": "C3",
+      "type": "derivation",
+      "summary": "Kernel-checked derivation from labeled axioms",
+      "suffices": true,
+      "detail": "Symbolic derivation from labeled axioms SR-1 (energy conservation) and SR-2 (universal speed limit). The kernel verified each step."
+    }
+  ],
+  "defeats": [
+    {
+      "id": "D1",
+      "type": "undercut",
+      "target": "C1",
+      "target_kind": "certificate",
+      "claim": "Testimony alone cannot lift J1 off the floor",
+      "detail": "The evidence presented for J1 is bare testimony. It does not support the claim. Under the floor rules, J1 has no working certificate and cannot stand."
+    },
+    {
+      "id": "D2",
+      "type": "rebut",
+      "target": "J1",
+      "target_kind": "judgment",
+      "claim": "J3 contradicts J1: the event requires stellar-scale energy or an FTL channel, both excluded by the floor",
+      "detail": "J3 (a standing floor theorem) and J1 cannot both be true. J3 is certified, J1 is not. The rebut lands on J1 and it is defeated."
+    }
+  ],
+  "depends_on": {
+    "J1": [],
+    "J2": [],
+    "J3": ["J4"],
+    "J4": []
+  },
+  "reputation": {
+    "source": "Person X (claimant)",
+    "before": "neutral: 0 defeats, 0 standing authored judgments",
+    "after": "defeated/standing = 1/0. Future testimony from X weighs less automatically.",
+    "note": "Reputation is a derived judgment. It updates only when an authored judgment resolves."
+  },
+  "suggested_actions": [
+    { "id": "A1", "action": "Flag J1 to hard-negative set", "detail": "Add (input, claim) pair to the training queue as a hard negative." },
+    { "id": "A2", "action": "Strengthen certificate for J2", "detail": "J2 stands but its certificate could be stronger." }
+  ],
+  "status_legend": {
+    "theorem": "kernel-certified derivation from the floor",
+    "observation": "grounded by replayable measurement",
+    "assumption": "explicitly labeled, used but not proven",
+    "contested": "standing defeat against it, unresolved",
+    "defeated": "a defeat has landed and is final",
+    "unaudited": "no certificate, no path to the floor"
+  },
+  "notes": [
+    "Hand-built fixture. A real closer would derive status, cascade, and reputation.",
+    "Teleport is the canonical worked example from the August design doc."
+  ]
+}
