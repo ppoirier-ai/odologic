@@ -1,0 +1,388 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Odologic — argument graph</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #faf9f5; --ink: #23211c; --mut: #7d7a6f; --line: #e4e1d7;
+  --green: #1f6f54; --blue: #1d5f8a; --amber: #8a6a1f; --violet: #6a3fa0;
+  --red: #a03030; --gray: #8a8779;
+}
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: var(--bg); color: var(--ink); font-size: 14.5px; overflow: hidden; }
+#stage { position: relative; height: 100vh; }
+svg { position: absolute; inset: 0; width: 100%; height: 100%; cursor: grab; }
+svg:active { cursor: grabbing; }
+
+/* nodes */
+.gnode { position: absolute; width: 235px; border-radius: 12px; background: #fff;
+  border: 1.5px solid var(--line); padding: 12px 14px; cursor: pointer;
+  box-shadow: 0 1px 3px rgba(35,33,28,.06); transition: opacity .25s, box-shadow .15s, transform .15s; }
+.gnode:hover { box-shadow: 0 3px 12px rgba(35,33,28,.13); transform: translateY(-1px); }
+.gnode .nid { font-family: ui-monospace, monospace; font-size: 10.5px; font-weight: 700;
+  letter-spacing: 0.06em; }
+.gnode .ntext { font-size: 12.8px; line-height: 1.4; margin-top: 4px; }
+.gnode .nfoot { display: flex; gap: 6px; margin-top: 8px; align-items: center; }
+.gnode.term { border-radius: 6px; }
+.gnode.term .nid { color: var(--mut); }
+.gnode.cert { border: 1.5px dashed var(--green); border-radius: 6px; }
+.gnode.cert .nid { color: var(--green); }
+.gnode.defeat { border: 1.5px dashed var(--red); background: #fbeeec; border-radius: 6px; }
+.gnode.defeat .nid { color: var(--red); }
+.gnode.judg { border-radius: 12px; }
+.gnode.judg .ntext { font-weight: 600; }
+.gnode.kernel { background: #23211c; color: #fff; border: none; }
+.gnode.kernel .nid { color: #b9e4d2; }
+.gnode.kernel .ntext { color: #ddd; font-weight: 400; }
+
+.chip { font-size: 9.5px; font-weight: 750; text-transform: uppercase; letter-spacing: 0.06em;
+  border-radius: 999px; padding: 2px 8px; color: #fff; }
+.c-theorem { background: var(--green); } .c-observation { background: var(--blue); }
+.c-assumption { background: var(--amber); } .c-defeated { background: var(--red); }
+.c-cert { background: var(--green); } .c-nocert { background: var(--gray); }
+.c-undercut { background: #c25e5e; } .c-rebut { background: var(--red); }
+
+/* evidence balance inside a judgment node */
+.bal { display: flex; gap: 3px; margin-top: 8px; height: 6px; border-radius: 3px; overflow: hidden; }
+.bal .for { background: var(--green); }
+.bal .against { background: var(--red); }
+.bal-label { font-size: 10px; color: var(--mut); margin-top: 3px; }
+
+/* edge labels */
+.elab { font-size: 10.5px; font-family: ui-monospace, monospace; fill: var(--mut);
+  paint-order: stroke; stroke: var(--bg); stroke-width: 3px; }
+
+/* side panel */
+#panel { position: absolute; top: 16px; right: 16px; width: 330px; max-height: calc(100vh - 32px);
+  overflow-y: auto; background: #fff; border: 1.5px solid var(--line); border-radius: 14px;
+  padding: 18px 20px; box-shadow: 0 4px 18px rgba(35,33,28,.10); display: none; z-index: 20; }
+#panel.on { display: block; }
+#panel .pclose { float: right; cursor: pointer; color: var(--mut); font-size: 16px; line-height: 1; }
+#panel h3 { font-size: 15px; margin: 2px 0 2px; }
+#panel .pid { font-family: ui-monospace, monospace; font-size: 11px; color: var(--mut); }
+#panel .ptext { font-size: 13.5px; margin: 8px 0 12px; line-height: 1.5; }
+#panel .sec { font-size: 10.5px; font-weight: 800; text-transform: uppercase;
+  letter-spacing: 0.09em; color: var(--mut); margin: 14px 0 6px; }
+#panel .evd { border-left: 3px solid var(--green); background: #f2f6f3; border-radius: 0 8px 8px 0;
+  padding: 8px 12px; margin-bottom: 8px; font-size: 12.8px; }
+#panel .evd.against { border-left-color: var(--red); background: #f8efee; }
+#panel .evd b.k { font-family: ui-monospace, monospace; font-size: 11px; color: var(--mut); }
+#panel .bal2 { display: flex; height: 8px; border-radius: 4px; overflow: hidden; margin: 6px 0 2px; }
+#panel .bal2 .for { background: var(--green); } #panel .bal2 .against { background: var(--red); }
+#panel .balnote { font-size: 11.5px; color: var(--mut); }
+#panel .golink { color: var(--green); font-weight: 650; cursor: pointer; font-size: 12.5px; }
+#panel .golink:hover { text-decoration: underline; }
+
+/* header */
+#hud { position: absolute; top: 16px; left: 16px; z-index: 15; max-width: 340px; }
+#hud .wordmark { font-size: 11px; letter-spacing: 0.22em; font-weight: 800; color: var(--mut); }
+#hud .wordmark b { color: var(--green); }
+#hud h1 { font-size: 19px; font-weight: 750; margin-top: 6px; }
+#hud p { font-size: 12.5px; color: var(--mut); margin-top: 4px; line-height: 1.45; }
+#hud .legend { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 10px; font-size: 10.5px;
+  color: var(--mut); }
+#hud .legend span { display: inline-flex; align-items: center; gap: 4px; }
+#hud .lg { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+
+/* dimming for focus mode */
+.dimmed { opacity: 0.16; }
+path.dimmed { opacity: 0.05; }
+text.dimmed { opacity: 0.1; }
+</style>
+</head>
+<body>
+<div id="hud">
+  <div class="wordmark">ODO<b>LOGIC</b> · argument graph</div>
+  <h1>Who must this claim be true for?</h1>
+  <p>Click any node to focus its neighborhood: what it needs to stand (downward), what
+  follows from it (upward), and everything that attacks or supports it. Hover an edge
+  label for the relation. <b>Try J1.</b></p>
+  <div class="legend">
+    <span><i class="lg" style="border:1.5px solid var(--ink);border-radius:2px;background:#fff"></i>term</span>
+    <span><i class="lg" style="background:var(--green)"></i>theorem</span>
+    <span><i class="lg" style="background:var(--blue)"></i>observation</span>
+    <span><i class="lg" style="border:1.5px dashed var(--green);background:#fff;border-radius:2px"></i>certificate</span>
+    <span><i class="lg" style="border:1.5px dashed var(--red);background:#fbeeec;border-radius:2px"></i>defeat</span>
+  </div>
+</div>
+
+<div id="panel">
+  <span class="pclose" onclick="closePanel()">✕</span>
+  <div class="pid" id="p-id"></div>
+  <h3 id="p-text"></h3>
+  <div id="p-body"></div>
+</div>
+
+<div id="stage">
+  <svg id="edges"></svg>
+  <div id="nodes"></div>
+</div>
+
+<script>
+/* ---- data: same teleport worldsheet ---- */
+const NODES = [
+  { id:"K",  kind:"kernel", x:430, y:600, w:235, text:"KERNEL · outside the net. Validates certificates, runs the closer, proposes nothing.",
+    panel:{ id:"kernel", text:"The reasoning kernel sits outside the network. It validates and audits; an LLM may propose, but never certifies its own proposals." } },
+
+  { id:"J1", kind:"judg", x:430, y:60, status:"defeated", label:"Judgment",
+    text:"X teleported from Japan to New York in an instant",
+    for:0, against:2,
+    panel:{ id:"J1", text:"X teleported from Japan to New York in an instant", status:"defeated",
+      forEv:[], againstEv:[
+        ["D1 · undercut → C1","The only certificate behind J1 is unaudited claimant testimony with no protocol. Testimony cannot lift a first-order physical claim off the floor."],
+        ["D2 · rebut via J3","J3, a standing floor theorem, states the event requires stellar-scale energy or an FTL channel, both excluded by J4. J1 and J3 cannot both be true; J3 is certified, J1 is not."]],
+      needs:["Nothing at the floor — that is the problem. J1 has no depends_on path to first principles, so it can be asserted but never stand."],
+      follows:["If J1 were somehow true, general relativity would need revision. Nothing in this worldsheet depends on J1, so its defeat cascades to nothing — the Term T2 survives untouched."] } },
+
+  { id:"J2", kind:"judg", x:70, y:60, status:"observation", label:"Judgment",
+    text:"X took a flight instead, arriving 14 hours later",
+    for:1, against:0,
+    panel:{ id:"J2", text:"X took a flight instead, arriving 14 hours later", status:"observation",
+      forEv:[["C2 · measurement","Border and airline records with a logged, replayable protocol. Any agent can re-derive the timestamps from the record set."]],
+      againstEv:[],
+      needs:["Grounded one hop from the floor via C2, a replayable measurement."],
+      follows:["As the standing rival of J1, J2 is what J1's defeat leaves behind: the event E gets a consistent physical account."] } },
+
+  { id:"J3", kind:"judg", x:430, y:250, status:"theorem", label:"Judgment",
+    text:"Event E requires stellar-scale energy or an FTL channel",
+    for:1, against:0,
+    panel:{ id:"J3", text:"Event E requires stellar-scale energy or an FTL channel", status:"theorem",
+      forEv:[["C2 · measurement","Border and airline records constrain the event window; protocol logged and replayable."]],
+      againstEv:[],
+      needs:["depends_on J4: macroscopic matter cannot relocate instantaneously. Certificates trace to kernel-checked derivation."],
+      follows:["D2 uses J3 to rebut J1. If J3 fell, the rebut against J1 would fall too — but J3 traces to the floor, so it stands."] } },
+
+  { id:"J4", kind:"judg", x:430, y:445, status:"theorem", label:"Judgment",
+    text:"Macroscopic matter cannot relocate instantaneously",
+    for:1, against:0,
+    panel:{ id:"J4", text:"Macroscopic matter cannot relocate instantaneously", status:"theorem",
+      forEv:[["C3 · derivation","Kernel-checked derivation from labeled axioms SR-1 (energy conservation) and SR-2 (universal speed limit). The kernel verified each step."]],
+      againstEv:[],
+      needs:["Floor: energy conservation, special relativity, no FTL signaling. This is the bottom of the chain — axioms, labeled as such."],
+      follows:["Grounds J3, which grounds the rebut D2 that defeats J1. The entire verdict on the teleport claim rests on this node."] } },
+
+  { id:"T2", kind:"term", x:70, y:250, label:"Term",
+    text:"Event E: person X in Tokyo 13:00 JST, New York 13:05 JST, yesterday",
+    panel:{ id:"T2", text:"Event E: person X in Tokyo 13:00 JST, New York 13:05 JST, yesterday", status:null,
+      forEv:[], againstEv:[],
+      needs:["Terms are never true or false — both rival claims J1 and J2 attach cleanly to the same event descriptor."],
+      follows:["J1 and J2 are both about this term. Defeating J1 never kills T2: the cascade rule stops at judgments."] } },
+
+  { id:"T1", kind:"term", x:70, y:445, label:"Term",
+    text:"Energy conservation · special relativity · no FTL signaling",
+    panel:{ id:"T1", text:"Energy conservation · special relativity · no FTL signaling", status:null,
+      forEv:[], againstEv:[],
+      needs:["The floor's subject matter. Axioms are labeled, not proven."],
+      follows:["J3 and J4 depend on these terms; nothing attacks them in this worldsheet."] } },
+
+  { id:"C1", kind:"cert", x:790, y:60, suffices:false, label:"Certificate",
+    text:"Claimant testimony · unaudited source · no protocol attached",
+    panel:{ id:"C1", text:"Claimant testimony, unaudited, no protocol", status:null,
+      forEv:[], againstEv:[],
+      needs:["To suffice, a certificate must provide a schema, a measurement with a logged protocol, or a labeled axiom. C1 is none of the three."],
+      follows:["Nothing — an insufficient certificate grounds no judgment. D1 attacks it directly."] } },
+
+  { id:"C2", kind:"cert", x:790, y:250, suffices:true, label:"Certificate",
+    text:"Measurement: border + airline records · protocol logged · replayable",
+    panel:{ id:"C2", text:"Border and airline records, protocol logged, replayable", status:null,
+      forEv:[], againstEv:[],
+      needs:["A measurement with a logged acquisition protocol qualifies under the floor rules."],
+      follows:["Grounds J2 as an observation and contributes to J3's certification."] } },
+
+  { id:"C3", kind:"cert", x:790, y:445, suffices:true, label:"Certificate",
+    text:"Derivation checked by kernel · rule table v0.3 · axioms labeled at floor",
+    panel:{ id:"C3", text:"Kernel-checked derivation, axioms labeled at floor", status:null,
+      forEv:[], againstEv:[],
+      needs:["Kernel-verified derivation from labeled axioms SR-1, SR-2."],
+      follows:["Grounds J4 as a theorem. Everything above it in this chain inherits its standing."] } },
+
+  { id:"D1", kind:"defeat", dtype:"undercut", x:1080, y:120, label:"Defeat (undercut)",
+    text:"C1 has no protocol; testimony alone cannot lift J1 off the floor",
+    panel:{ id:"D1", text:"Undercut: testimony cannot lift J1 off the floor", status:null,
+      forEv:[], againstEv:[],
+      needs:["Floor rule: certificates must be schemas, measurements with protocols, or labeled axioms."],
+      follows:["By attacking C1 rather than J1 directly, this undercut removes J1's support without asserting anything about the event itself."] } },
+
+  { id:"D2", kind:"defeat", dtype:"rebut", x:1080, y:360, label:"Defeat (rebut)",
+    text:"J3 contradicts J1 directly; J3 stands as theorem",
+    panel:{ id:"D2", text:"Rebut: J3 contradicts J1, and J3 stands", status:null,
+      forEv:[], againstEv:[],
+      needs:["Rests on J3, which rests on J4, which traces to the floor."],
+      follows:["Lands on J1 directly. This is the stronger of the two defeats: it contradicts the claim, not just its evidence."] } },
+];
+
+/* edges: from, to, label, color, dashed, dir (1=forward along y) */
+const EDGES = [
+  { f:"J1", t:"T2",  l:"about term",            c:"#8a8779", d:false },
+  { f:"J2", t:"T2",  l:"about term",            c:"#8a8779", d:false },
+  { f:"J1", t:"J3",  l:"rebuts",                c:"#a03030", d:false },
+  { f:"J4", t:"J3",  l:"depends_on",            c:"#7d7a6f", d:false },
+  { f:"J3", t:"T1",  l:"depends_on",            c:"#7d7a6f", d:false },
+  { f:"J4", t:"T1",  l:"depends_on",            c:"#7d7a6f", d:false },
+  { f:"C2", t:"J3",  l:"certifies",             c:"#1f6f54", d:true  },
+  { f:"C3", t:"J4",  l:"certifies",             c:"#1f6f54", d:true  },
+  { f:"C1", t:"J1",  l:"insufficient support",  c:"#c9a24b", d:true  },
+  { f:"D1", t:"C1",  l:"undercuts",             c:"#a03030", d:true  },
+  { f:"D2", t:"J3",  l:"rests on",              c:"#a03030", d:true  },
+  { f:"D2", t:"J1",  l:"rebut lands on",        c:"#a03030", d:true  },
+  { f:"K",  t:"J1",  l:"audits J1", c:"#8a8779", d:true },
+];
+
+const $nodes = document.getElementById("nodes");
+const $edges = document.getElementById("edges");
+const $panel = document.getElementById("panel");
+
+function chipFor(n){
+  if (n.kind === "judg") return `<span class="chip c-${n.status}">${n.status}</span>`;
+  if (n.kind === "cert") return n.suffices ? `<span class="chip c-cert">suffices</span>` : `<span class="chip c-nocert">insufficient</span>`;
+  if (n.kind === "defeat") return `<span class="chip c-${n.dtype}">${n.dtype}</span>`;
+  return "";
+}
+function balanceBar(n){
+  if (n.kind !== "judg") return "";
+  const tot = n.for + n.against || 1;
+  return `<div class="bal"><div class="for" style="width:${(n.for/tot)*100}%"></div>
+    <div class="against" style="width:${(n.against/tot)*100}%"></div></div>
+    <div class="bal-label">${n.for} supporting · ${n.against} attacking</div>`;
+}
+function renderNodes(){
+  $nodes.innerHTML = "";
+  for (const n of NODES){
+    const el = document.createElement("div");
+    el.className = `gnode ${n.kind}`;
+    el.id = `node-${n.id}`;
+    el.style.left = n.x + "px"; el.style.top = n.y + "px";
+    el.innerHTML = `<div class="nid">${n.id} · ${n.label}</div>
+      <div class="ntext">${n.text}</div>
+      <div class="nfoot">${chipFor(n)}</div>${balanceBar(n)}`;
+    el.onclick = (e) => { e.stopPropagation(); focusNode(n.id); };
+    $nodes.appendChild(el);
+  }
+}
+
+function anchor(n, side){
+  // approximate node size for edge anchoring
+  const w = 235, h = n.kind==="judg" ? 132 : 96;
+  if (side === "r") return { x:n.x + w, y:n.y + h/2 };
+  if (side === "l") return { x:n.x,     y:n.y + h/2 };
+  if (side === "b") return { x:n.x + w/2, y:n.y + h };
+  return { x:n.x + w/2, y:n.y };
+}
+function nodeById(id){ return NODES.find(n=>n.id===id); }
+
+function renderEdges(){
+  const svgns = "http://www.w3.org/2000/svg";
+  $edges.innerHTML = "";
+  for (const e of EDGES){
+    const a = nodeById(e.f), b = nodeById(e.t);
+    // choose sides: use x/y relationship
+    let p1, p2;
+    if (Math.abs(a.x - b.x) > 120){         // horizontal-ish: connect side to side
+      const aRight = a.x < b.x;
+      p1 = anchor(a, aRight ? "r":"l"); p2 = anchor(b, aRight ? "l":"r");
+    } else {
+      const aAbove = a.y < b.y;
+      p1 = anchor(a, aAbove ? "b":"t"); p2 = anchor(b, aAbove ? "t":"b");
+    }
+    const g = document.createElementNS(svgns, "g");
+    g.id = `edge-${e.f}-${e.t}`;
+    const path = document.createElementNS(svgns, "path");
+    const mx = (p1.x+p2.x)/2, my = (p1.y+p2.y)/2;
+    const dx = p2.x-p1.x, dy = p2.y-p1.y, len = Math.hypot(dx,dy)||1;
+    const ux = dx/len, uy = dy/len;
+    const p3 = { x: mx + (uy)*14, y: my - (ux)*14 };  // slight curve
+    path.setAttribute("d", `M ${p1.x} ${p1.y} Q ${p3.x} ${p3.y} ${p2.x} ${p2.y}`);
+    path.setAttribute("fill", "none");
+    path.setAttribute("stroke", e.c);
+    path.setAttribute("stroke-width", "1.6");
+    if (e.d) path.setAttribute("stroke-dasharray", "5 4");
+    path.setAttribute("marker-end", "url(#arrow)");
+    path.classList.add("edge");
+    path.id = `path-${e.f}-${e.t}`;
+    g.appendChild(path);
+    const t = document.createElementNS(svgns, "text");
+    t.setAttribute("x", p3.x + (e.l==="depends_on"?(e.f==="T1"?-18:18):0)); t.setAttribute("y", p3.y - 4);
+    t.setAttribute("text-anchor", "middle");
+    t.setAttribute("class", "elab");
+    t.textContent = e.l;
+    t.id = `lab-${e.f}-${e.t}`;
+    g.appendChild(t);
+    $edges.appendChild(g);
+  }
+  // marker def
+  const defs = document.createElementNS(svgns, "defs");
+  defs.innerHTML = `<marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5"
+    markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <path d="M 0 0 L 10 5 L 0 10 z" fill="#7d7a6f"/></marker>`;
+  $edges.appendChild(defs);
+}
+
+/* ---- focus mode ---- */
+let focused = null;
+function neighborhood(id){
+  // everything 1 hop from node, plus its edges
+  const nb = new Set([id]);
+  for (const e of EDGES){ if (e.f===id) nb.add(e.t); if (e.t===id) nb.add(e.f); }
+  return nb;
+}
+function focusNode(id){
+  focused = id;
+  const nb = neighborhood(id);
+  document.querySelectorAll(".gnode").forEach(el=>{
+    el.classList.toggle("dimmed", !nb.has(el.id.replace("node-","")));
+  });
+  document.querySelectorAll("#edges g").forEach(g=>{
+    const [f,t] = g.id.replace("edge-","").split("-");
+    g.querySelectorAll("path,text").forEach(x=>x.classList.toggle("dimmed", !(nb.has(f)&&nb.has(t))));
+  });
+  openPanel(nodeById(id));
+}
+function clearFocus(){
+  focused = null;
+  document.querySelectorAll(".dimmed").forEach(el=>el.classList.remove("dimmed"));
+  closePanel();
+}
+document.getElementById("stage").addEventListener("click", e=>{ if (e.target.id==="stage"||e.target.tagName==="svg") clearFocus(); });
+
+function openPanel(n){
+  const p = n.panel; if (!p) return;
+  document.getElementById("p-id").textContent = p.id;
+  document.getElementById("p-text").textContent = p.text;
+  let html = "";
+  if (p.status) html += `<span class="chip c-${p.status}">${p.status}</span><div style="height:8px"></div>`;
+  if (p.forEv && p.forEv.length){
+    html += `<div class="sec">Corroborating</div>`;
+    for (const [k,v] of p.forEv) html += `<div class="evd"><b class="k">${k}</b> — ${v}</div>`;
+  }
+  if (p.againstEv && p.againstEv.length){
+    html += `<div class="sec">Disproving</div>`;
+    for (const [k,v] of p.againstEv) html += `<div class="evd against"><b class="k">${k}</b> — ${v}</div>`;
+  }
+  if (n.kind === "judg"){
+    const tot = n.for + n.against || 1;
+    html += `<div class="sec">Balance of argument</div>
+      <div class="bal2"><div class="for" style="width:${(n.for/tot)*100}%"></div>
+      <div class="against" style="width:${(n.against/tot)*100}%"></div></div>
+      <div class="balnote">${n.for} for · ${n.against} against — ${n.for>n.against?"the claim stands on this balance":(n.against>n.for?"the claim is defeated on this balance":"no weight either way")}</div>`;
+  }
+  if (p.needs && p.needs.length){
+    html += `<div class="sec">Must be true, for this to stand</div>`;
+    for (const v of p.needs) html += `<div class="evd">${v}</div>`;
+  }
+  if (p.follows && p.follows.length){
+    html += `<div class="sec">Follows, if this is true</div>`;
+    for (const v of p.follows) html += `<div class="evd">${v}</div>`;
+  }
+  document.getElementById("p-body").innerHTML = html;
+  $panel.classList.add("on");
+}
+function closePanel(){ $panel.classList.remove("on"); }
+
+/* init */
+renderNodes();
+renderEdges();
+</script>
+</body>
+</html>
