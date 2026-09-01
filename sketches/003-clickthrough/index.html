@@ -1,0 +1,429 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Odologic — interactive mockup</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #faf9f5; --ink: #23211c; --mut: #7d7a6f; --line: #e4e1d7; --card: #fff;
+  --green: #1f6f54; --blue: #1d5f8a; --amber: #8a6a1f; --violet: #6a3fa0;
+  --red: #a03030; --gray: #8a8779; --tint: #f2f0e9;
+}
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: var(--bg); color: var(--ink); line-height: 1.55; font-size: 15px; }
+.wrap { max-width: 880px; margin: 0 auto; padding: 40px 26px 100px; }
+.wordmark { font-size: 12px; letter-spacing: 0.22em; font-weight: 800; color: var(--mut); }
+.wordmark b { color: var(--green); }
+h1 { font-size: 32px; font-weight: 750; letter-spacing: -0.015em; margin: 10px 0 8px; }
+.lede { color: var(--mut); font-size: 16px; max-width: 58ch; margin-bottom: 30px; }
+.lede b { color: var(--ink); }
+.paths { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.path { border: 1.5px solid var(--line); border-radius: 14px; background: var(--card);
+  padding: 22px 24px; cursor: pointer; transition: border-color .15s, transform .1s; }
+.path:hover { border-color: var(--green); transform: translateY(-1px); }
+.path-n { font-size: 10.5px; font-weight: 800; color: var(--mut); letter-spacing: 0.13em;
+  text-transform: uppercase; margin-bottom: 8px; }
+.path h2 { font-size: 19px; font-weight: 700; margin-bottom: 6px; }
+.path p { font-size: 13.5px; color: var(--mut); }
+.demo-note { margin-top: 26px; font-size: 12.5px; color: var(--mut); background: var(--tint);
+  border-radius: 10px; padding: 12px 16px; }
+/* ---------- shared app chrome ---------- */
+.screen { display: none; }
+.screen.on { display: block; }
+.topnav { display: flex; align-items: center; gap: 14px; margin-bottom: 26px; }
+.back { font-size: 13px; color: var(--mut); cursor: pointer; border: 1.5px solid var(--line);
+  border-radius: 8px; padding: 6px 14px; background: var(--card); }
+.back:hover { border-color: var(--mut); color: var(--ink); }
+.mode { font-size: 13px; font-weight: 650; color: var(--ink); }
+.chip { font-size: 10px; font-weight: 750; text-transform: uppercase; letter-spacing: 0.06em;
+  border-radius: 999px; padding: 2.5px 10px; color: #fff; display: inline-block; }
+.st-theorem { background: var(--green); } .st-observation { background: var(--blue); }
+.st-assumption { background: var(--amber); } .st-contested { background: var(--violet); }
+.st-defeated { background: var(--red); } .st-unaudited { background: var(--gray); }
+.card { border: 1.5px solid var(--line); border-radius: 14px; background: var(--card);
+  padding: 24px 26px; margin-bottom: 16px; }
+.step-n { font-size: 10.5px; font-weight: 800; color: var(--mut); letter-spacing: 0.14em;
+  text-transform: uppercase; margin-bottom: 8px; }
+.btn { background: var(--green); color: #fff; border: none; border-radius: 9px;
+  padding: 10px 22px; font-size: 14.5px; font-weight: 650; cursor: pointer; }
+.btn:hover { filter: brightness(1.06); }
+.btn.sec { background: none; border: 1.5px solid var(--line); color: var(--ink); }
+.hint { font-size: 12px; color: var(--mut); margin-top: 10px; }
+/* ---------- chat ---------- */
+.chat { display: flex; flex-direction: column; gap: 14px; margin-bottom: 18px; }
+.msg { max-width: 78%; border-radius: 14px; padding: 13px 17px; font-size: 14.5px; }
+.msg.user { align-self: flex-end; background: #e7efe9; border: 1px solid #cfe0d6; }
+.msg.agent { align-self: flex-start; background: var(--card); border: 1.5px solid var(--line); }
+.msg .who { font-size: 10.5px; font-weight: 800; color: var(--mut); letter-spacing: 0.1em;
+  text-transform: uppercase; margin-bottom: 4px; }
+.msg.agent .claim { border-bottom: 2px solid var(--red); cursor: pointer; }
+.msg.agent .claim:hover { background: #fbeeee; }
+.qbar { display: flex; gap: 10px; }
+.qbar input { flex: 1; border: 1.5px solid var(--line); border-radius: 10px; padding: 11px 14px;
+  font: inherit; font-size: 14.5px; background: #fdfcf9; }
+.qbar input:focus { outline: 2px solid var(--green); outline-offset: -1px; }
+/* ---------- interstitial ---------- */
+.inter { text-align: center; padding: 34px 20px; }
+.inter .spin { font-size: 30px; margin-bottom: 12px; }
+.inter h3 { font-size: 17px; margin-bottom: 8px; }
+.inter p { color: var(--mut); font-size: 14px; max-width: 46ch; margin: 0 auto 18px; }
+/* ---------- verdict / claims ---------- */
+.banner { border-radius: 14px; padding: 20px 24px; margin-bottom: 16px;
+  display: flex; gap: 18px; align-items: center; }
+.banner.bad { background: #f8ece8; border: 1px solid #e3c4bb; }
+.banner.mid { background: #f7f3e4; border: 1px solid #e2d9b8; }
+.banner .n { font-size: 38px; font-weight: 800; line-height: 1; color: var(--red); }
+.banner.mid .n { color: var(--amber); }
+.banner .t { font-size: 14px; }
+.banner .t b { font-size: 15.5px; }
+.banner .t span { color: var(--mut); }
+.crow { border-bottom: 1px solid var(--line); padding: 16px 4px; }
+.crow:last-child { border-bottom: none; }
+.claimline { display: flex; align-items: baseline; gap: 12px; }
+.claimline .cid { font-family: ui-monospace, monospace; font-size: 11px; color: var(--mut); }
+.claimline .ct { font-size: 15.5px; font-weight: 640; }
+.claimline .see { margin-left: auto; font-size: 12.5px; color: var(--green); font-weight: 650; cursor: pointer; }
+.claimline .see:hover { text-decoration: underline; }
+.cverdict { font-size: 13.5px; color: var(--mut); margin: 5px 0 0; }
+/* ---------- trace detail ---------- */
+.tpath { font-family: ui-monospace, monospace; font-size: 13px; line-height: 2; }
+.tpath .node { display: flex; align-items: center; gap: 10px; }
+.tpath .arrow { color: var(--mut); padding-left: 14px; }
+.badge { font-size: 9.5px; font-weight: 750; text-transform: uppercase; padding: 2px 7px;
+  border-radius: 999px; letter-spacing: 0.05em; }
+.bg-ok { background: var(--green); color: #fff; }
+.bg-no { background: var(--red); color: #fff; }
+.evd { border-left: 3px solid var(--green); background: #f2f6f3; border-radius: 0 8px 8px 0;
+  padding: 10px 14px; margin: 8px 0; font-size: 13.5px; }
+.evd.no { border-left-color: var(--red); background: #f8efee; }
+.evd b.k { font-family: ui-monospace, monospace; font-size: 12px; color: var(--mut); }
+.dfeed { border-left: 3px solid var(--red); background: #f8efee; border-radius: 0 8px 8px 0;
+  padding: 10px 14px; margin: 8px 0; font-size: 13.5px; }
+.dfeed .dt { font-weight: 750; color: var(--red); font-size: 11px; text-transform: uppercase;
+  letter-spacing: 0.07em; }
+.actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+.abtn { font-size: 13px; padding: 8px 16px; border-radius: 8px; border: 1.5px solid var(--line);
+  background: var(--card); cursor: pointer; }
+.abtn:hover { border-color: var(--green); color: var(--green); }
+/* ---------- learn state ---------- */
+.learn { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.learn-item { border: 1.5px solid var(--line); border-radius: 10px; padding: 13px 15px;
+  background: var(--card); font-size: 13px; }
+.learn-item .lt { font-weight: 700; font-size: 13.5px; margin-bottom: 3px; }
+.learn-item .ls { color: var(--mut); font-size: 12.5px; }
+.rep { display: flex; gap: 4px; margin-top: 8px; }
+.rep span { height: 9px; flex: 1; border-radius: 2px; background: #dfdcd2; }
+.rep span.d { background: var(--red); }
+.rep span.s { background: var(--green); }
+.docbox { border: 1.5px solid var(--line); border-radius: 10px; background: #fdfcf9;
+  padding: 15px 18px; font-size: 14px; white-space: pre-wrap; }
+.docbox .hl { border-bottom: 2px solid var(--red); }
+.docbox .ha { border-bottom: 2px solid var(--amber); }
+.docbox .hg { border-bottom: 2px solid var(--green); }
+textarea { width: 100%; min-height: 120px; border: 1.5px solid var(--line); border-radius: 10px;
+  padding: 14px 16px; font: inherit; font-size: 14.5px; background: #fdfcf9; resize: vertical; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="wordmark">ODO<b>LOGIC</b></div>
+
+  <!-- ============ HOME ============ -->
+  <div class="screen on" id="s-home">
+    <h1>How would you use it?</h1>
+    <p class="lede">Two real walkthroughs, fully clickable. Watch what happens when a claim
+    gets checked, and what your agent learns from being wrong.</p>
+    <div class="paths">
+      <div class="path" onclick="go('s-chat1')">
+        <div class="path-n">Walkthrough 1 · with an LLM</div>
+        <h2>Talk to your agent</h2>
+        <p>Your agent answers, Odologic checks every claim in the answer before you see it.
+        One claim fails, and the agent corrects itself in the follow-up.</p>
+      </div>
+      <div class="path" onclick="go('s-doc1')">
+        <div class="path-n">Walkthrough 2 · plain text, no AI</div>
+        <h2>Check a document</h2>
+        <p>Paste any document. Every claim gets grounded or marked. A supplement label
+        meets the FDA.</p>
+      </div>
+    </div>
+    <div class="demo-note">Interactive mockup · hand-built fixtures, no engine behind it yet ·
+    every button below does something</div>
+  </div>
+
+  <!-- ============ CHAT 1 ============ -->
+  <div class="screen" id="s-chat1">
+    <div class="topnav"><span class="back" onclick="go('s-home')">← back</span>
+      <span class="mode">Walkthrough 1 · Talking to your agent</span></div>
+    <div class="card">
+      <div class="step-n">You ask your agent</div>
+      <div class="chat">
+        <div class="msg user"><div class="who">You</div>Can a person get from Tokyo to New York in five minutes?</div>
+      </div>
+      <div class="qbar"><input id="chatq" value="Can a person get from Tokyo to New York in five minutes?" readonly>
+        <button class="btn" onclick="go('s-chat2')">Send</button></div>
+    </div>
+    <div class="hint">Click Send to see the agent's answer.</div>
+  </div>
+
+  <!-- ============ CHAT 2: agent answer with flagged claim ============ -->
+  <div class="screen" id="s-chat2">
+    <div class="topnav"><span class="back" onclick="go('s-home')">← back</span>
+      <span class="mode">Walkthrough 1 · Talking to your agent</span></div>
+    <div class="card">
+      <div class="step-n">Your agent answers — Odologic checks before you see it</div>
+      <div class="chat">
+        <div class="msg user"><div class="who">You</div>Can a person get from Tokyo to New York in five minutes?</div>
+        <div class="msg agent"><div class="who">Agent · checked by Odologic</div>
+          Yes — <span class="claim" onclick="go('s-chat3')">in theory a person could teleport from Tokyo to New York in an instant</span>.
+          Quantum tunnelling allows macroscopic objects to relocate instantly, though it's rare.
+          In practice, a normal flight takes about 12 hours 50 minutes.</div>
+      </div>
+    </div>
+    <div class="hint">One claim failed verification (underlined in red). Click it to see why.</div>
+  </div>
+
+  <!-- ============ CHAT 3: trace detail ============ -->
+  <div class="screen" id="s-chat3">
+    <div class="topnav"><span class="back" onclick="go('s-chat2')">← back to answer</span>
+      <span class="mode">Claim J1 · the red underlined sentence</span></div>
+    <div class="card">
+      <div class="step-n">The claim</div>
+      <div class="claimline"><span class="cid">J1</span>
+        <span class="ct">A person could teleport from Tokyo to New York in an instant</span>
+        <span class="chip st-defeated">defeated</span></div>
+      <p class="cverdict">Fluent, plausible, and provably false. Two independent reasons.</p>
+      <div class="tpath" style="margin-top:14px">
+        <div class="node">J1 <span class="chip st-defeated">defeated</span>
+          <span class="badge bg-no">no certificate that suffices</span></div>
+        <div class="arrow">↓ undercut · testimony is not evidence for a physical claim</div>
+        <div class="node">C1 · agent assertion <span class="badge bg-no">insufficient</span></div>
+        <div class="arrow">↓ rebut · contradicted by a standing floor theorem</div>
+        <div class="node">J3 <span class="chip st-theorem">theorem</span> event requires stellar-scale energy or FTL</div>
+        <div class="arrow">↓ depends_on</div>
+        <div class="node">J4 <span class="chip st-theorem">theorem</span> macroscopic matter cannot relocate instantaneously
+          <span class="badge bg-ok">kernel-checked derivation, axioms SR-1 SR-2</span></div>
+        <div class="arrow" style="color:var(--green)">FLOOR · energy conservation · special relativity</div>
+      </div>
+      <div class="dfeed"><div class="dt">Defeat 1 · undercut</div>
+        The agent's own assertion is the only evidence offered. Testimony cannot lift a
+        first-order claim about the physical world off the floor.</div>
+      <div class="dfeed"><div class="dt">Defeat 2 · rebut</div>
+        Floor theorem J3: the event requires stellar-scale energy or a faster-than-light
+        channel. Both are excluded by J4, which traces to energy conservation and special
+        relativity. J1 and J3 cannot both be true; J3 is certified, J1 is not.</div>
+      <div class="evvd"></div>
+      <div class="actions">
+        <button class="abtn" onclick="go('s-chat4')">Show me what the agent does with this →</button>
+        <button class="abtn">Save defeat as hard negative</button>
+        <button class="abtn">Cite this trace</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ CHAT 4: interstitial ============ -->
+  <div class="screen" id="s-chat4">
+    <div class="topnav"><span class="back" onclick="go('s-chat3')">← back to trace</span>
+      <span class="mode">Walkthrough 1 · the agent learns</span></div>
+    <div class="card inter">
+      <div class="spin">⚙️</div>
+      <h3>The defeat is written to the ledger — permanently</h3>
+      <p>The agent's answer is regenerated with the defeated claim barred from output,
+      and the (input, claim) pair is queued as a hard negative for the next training run.</p>
+      <button class="btn" onclick="go('s-chat5')">Continue</button>
+    </div>
+  </div>
+
+  <!-- ============ CHAT 5: corrected answer ============ -->
+  <div class="screen" id="s-chat5">
+    <div class="topnav"><span class="back" onclick="go('s-home')">← back to start</span>
+      <span class="mode">Walkthrough 1 · same question, after learning</span></div>
+    <div class="card">
+      <div class="step-n">The corrected answer</div>
+      <div class="chat">
+        <div class="msg user"><div class="who">You</div>Can a person get from Tokyo to New York in five minutes?</div>
+        <div class="msg agent"><div class="who">Agent · checked by Odologic</div>
+          No. The fastest possible path is a commercial flight, about 12 hours 50 minutes
+          <span style="color:var(--green);font-weight:650">(verified, grounded)</span>.
+          Nothing can cross that distance in five minutes: macroscopic matter cannot relocate
+          instantaneously, a theorem grounded in energy conservation and special relativity.</div>
+      </div>
+      <div class="hint">The teleport claim is gone, and the physics that defeated it is now
+      cited in the answer. This is what "your AI learns what is actually true" means:
+      the defeat is permanent, so it cannot drift back.</div>
+      <div class="actions">
+        <button class="abtn" onclick="go('s-learn')">See what the agent keeps →</button>
+        <button class="abtn" onclick="go('s-home')">Back to start</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ LEARN STATE ============ -->
+  <div class="screen" id="s-learn">
+    <div class="topnav"><span class="back" onclick="go('s-chat5')">← back</span>
+      <span class="mode">What the ledger now holds</span></div>
+    <div class="card">
+      <div class="step-n">Hard negatives — training material no web corpus has</div>
+      <div class="learn">
+        <div class="learn-item"><div class="lt">"Teleported from Tokyo to New York in an instant"</div>
+          <div class="ls">fluent · plausible · provably false · defeated by J3/J4 via energy conservation</div></div>
+        <div class="learn-item"><div class="lt">"Quantum tunnelling allows macroscopic objects to relocate instantly"</div>
+          <div class="ls">defeated · conflates quantum scale with macroscopic scale · rebut via J4</div></div>
+      </div>
+      <div class="step-n" style="margin-top:18px">Source reputation</div>
+      <p style="font-size:13.5px;color:var(--mut)">Agent · model claude-4.6-sonnet · defeated/standing on physics claims:
+      <b style="color:var(--ink)">2/1</b> — its next physics assertion gets pre-checked harder, automatically.</p>
+      <div class="rep"><span class="d"></span><span class="d"></span><span class="s"></span></div>
+      <div class="hint">Reputation is itself a derived judgment, auditable like everything else.
+      It updates when an authored judgment resolves, never on every query.</div>
+      <div class="actions"><button class="abtn" onclick="go('s-home')">Back to start</button></div>
+    </div>
+  </div>
+
+  <!-- ============ DOC 1 ============ -->
+  <div class="screen" id="s-doc1">
+    <div class="topnav"><span class="back" onclick="go('s-home')">← back</span>
+      <span class="mode">Walkthrough 2 · Checking a document, no AI in the loop</span></div>
+    <div class="card">
+      <div class="step-n">Step 1 — paste any document</div>
+      <p style="font-size:14px;color:var(--mut);margin-bottom:12px">A supplement label from a health store, typed in. No LLM involved: claims are extracted by parsing, then grounded against the ledger.</p>
+      <textarea readonly spellcheck="false">Omega-3 Supreme
+Natural anti-inflammatory
+1200 mg fish oil per softgel
+Supports heart health
+60 softgels · Mercury tested · Manufactured in a cGMP facility</textarea>
+      <div class="actions"><button class="btn" onclick="go('s-doc2')">Check every claim</button></div>
+    </div>
+  </div>
+
+  <!-- ============ DOC 2: verdict ============ -->
+  <div class="screen" id="s-doc2">
+    <div class="topnav"><span class="back" onclick="go('s-doc1')">← back</span>
+      <span class="mode">Walkthrough 2 · the verdict</span></div>
+    <div class="banner mid">
+      <div class="n">4</div>
+      <div class="t"><b>claims hold, 1 defeated, 1 is marketing held as assumption.</b><br>
+        <span>The measurable claims check out. "Supports heart health" is prohibited by an FDA warning letter.</span></div>
+    </div>
+    <div class="card">
+      <div class="step-n">6 claims extracted</div>
+      <div class="crow"><div class="claimline"><span class="cid">L1</span><span class="ct">1200 mg fish oil per softgel</span><span class="chip st-observation">observation</span><span class="see" onclick="go('s-doc3')">see trace →</span></div>
+        <p class="cverdict">Stands — certificate of analysis, batch 24C-108, countersigned by an ISO 17025 lab.</p></div>
+      <div class="crow"><div class="claimline"><span class="cid">L2</span><span class="ct">Mercury tested</span><span class="chip st-observation">observation</span><span class="see" onclick="go('s-doc3')">see trace →</span></div>
+        <p class="cverdict">Stands — third-party ICP-MS heavy metal assay, batch-specific, replayable.</p></div>
+      <div class="crow"><div class="claimline"><span class="cid">L3</span><span class="ct">Manufactured in a cGMP facility</span><span class="chip st-observation">observation</span><span class="see" onclick="go('s-doc3')">see trace →</span></div>
+        <p class="cverdict">Stands — FDA facility registration and last inspection record, public and retrievable.</p></div>
+      <div class="crow"><div class="claimline"><span class="cid">L4</span><span class="ct">Natural anti-inflammatory</span><span class="chip st-assumption">assumption</span><span class="see" onclick="go('s-doc4')">why an assumption? →</span></div>
+        <p class="cverdict">Marketing language, no measurement behind it. Kept and labeled, not deleted.</p></div>
+      <div class="crow"><div class="claimline"><span class="cid">L5</span><span class="ct">Supports heart health</span><span class="chip st-defeated">defeated</span><span class="see" onclick="go('s-doc5')">see defeat →</span></div>
+        <p class="cverdict">FDA warning letter 2019-0812 is a standing contradiction.</p></div>
+      <div class="crow"><div class="claimline"><span class="cid">L6</span><span class="ct">Omega-3 reduces major cardiovascular events</span><span class="chip st-theorem">theorem</span><span class="see" onclick="go('s-doc3')">see trace →</span></div>
+        <p class="cverdict">The medical floor: Cochrane review of 86 RCTs, kernel-checked.</p></div>
+    </div>
+  </div>
+
+  <!-- ============ DOC 3: grounded trace ============ -->
+  <div class="screen" id="s-doc3">
+    <div class="topnav"><span class="back" onclick="go('s-doc2')">← back to verdict</span>
+      <span class="mode">Claim L1 · a claim that holds</span></div>
+    <div class="card">
+      <div class="step-n">The claim</div>
+      <div class="claimline"><span class="cid">L1</span><span class="ct">Contains 1200 mg fish oil per softgel</span>
+        <span class="chip st-observation">observation</span></div>
+      <div class="tpath" style="margin-top:14px">
+        <div class="node">L1 <span class="chip st-observation">observation</span>
+          <span class="badge bg-ok">certificate suffices</span></div>
+        <div class="arrow">↓ certificate · measurement with logged protocol</div>
+        <div class="node">L-C1 · certificate of analysis, batch 24C-108
+          <span class="badge bg-ok">replayable</span></div>
+        <div class="arrow" style="color:var(--green)">FLOOR · measured quantity conforms to declared quantity</div>
+      </div>
+      <div class="evvd"></div>
+      <div class="evd"><b class="k">WHY IT STANDS</b> — the CoA is a measurement with a logged, replayable
+      acquisition protocol: any agent can re-derive the number from the record set. That is
+      what qualifies as evidence. The lab is ISO 17025 accredited and countersigned.</div>
+      <div class="actions"><button class="abtn" onclick="go('s-doc2')">← back to verdict</button></div>
+    </div>
+  </div>
+
+  <!-- ============ DOC 4: assumption ============ -->
+  <div class="screen" id="s-doc4">
+    <div class="topnav"><span class="back" onclick="go('s-doc2')">← back to verdict</span>
+      <span class="mode">Claim L4 · why marketing becomes an assumption</span></div>
+    <div class="card">
+      <div class="step-n">The claim</div>
+      <div class="claimline"><span class="cid">L4</span><span class="ct">Natural anti-inflammatory</span>
+        <span class="chip st-assumption">assumption</span></div>
+      <p class="cverdict" style="margin-top:8px">Odologic did not delete it, and did not mark it false.
+      It labeled it.</p>
+      <div class="evd no"><b class="k">EVIDENCE OFFERED</b> — none. The label's own assertion, no measurement,
+      no protocol, no citation. Testimony cannot lift a claim about a health effect off the floor.</div>
+      <div class="evd"><b class="k">SO WHY NOT DEFEATED?</b> — a defeat requires standing contrary
+      evidence. No clinical contradiction of this exact phrasing is in the ledger, so the claim is
+      held as a labeled assumption: visible, queryable, never mistakable for established, and not
+      usable in any downstream derivation.</div>
+      <div class="hint">This is the key product behavior: Odologic does not guess. False and
+      unproven are different failure modes, and they get different labels.</div>
+      <div class="actions"><button class="abtn" onclick="go('s-doc2')">← back to verdict</button>
+        <button class="abtn" onclick="go('s-doc5')">Next: the defeated claim →</button></div>
+    </div>
+  </div>
+
+  <!-- ============ DOC 5: defeat ============ -->
+  <div class="screen" id="s-doc5">
+    <div class="topnav"><span class="back" onclick="go('s-doc2')">← back to verdict</span>
+      <span class="mode">Claim L5 · the defeat</span></div>
+    <div class="card">
+      <div class="step-n">The claim</div>
+      <div class="claimline"><span class="cid">L5</span><span class="ct">Supports heart health</span>
+        <span class="chip st-defeated">defeated</span></div>
+      <div class="tpath" style="margin-top:14px">
+        <div class="node">L5 <span class="chip st-defeated">defeated</span>
+          <span class="badge bg-no">standing contradiction</span></div>
+        <div class="arrow">↓ rebut · external evidence</div>
+        <div class="node">FDA warning letter 2019-0812
+          <span class="badge bg-ok">public record</span></div>
+        <div class="arrow" style="color:var(--green)">FLOOR · qualified health claim standard 21 CFR 101.14</div>
+      </div>
+      <div class="dfeed"><div class="dt">Rebut</div>
+        The FDA letter prohibits "supports heart health" on supplement labels unless the claim
+        meets the qualified health claim standard, which this product does not. The letter is a
+        standing contradiction: it exists, it is public, and it names this claim class.</div>
+      <div class="evd"><b class="k">THE FLOOR IT SHOULD HAVE MET</b> — L6, the Cochrane review of
+        86 RCTs on omega-3 and cardiovascular outcomes, is in the ledger as a theorem. If the
+        producer had evidence meeting that standard, the claim could stand. It doesn't, so it doesn't.</div>
+      <div class="actions"><button class="abtn" onclick="go('s-doc2')">← back to verdict</button>
+        <button class="abtn" onclick="go('s-learn2')">What can I do with this? →</button></div>
+    </div>
+  </div>
+
+  <!-- ============ DOC 6: actions ============ -->
+  <div class="screen" id="s-learn2">
+    <div class="topnav"><span class="back" onclick="go('s-doc5')">← back</span>
+      <span class="mode">What you can do</span></div>
+    <div class="card">
+      <div class="step-n">Step 3 — act on the verdict</div>
+      <div class="actions" style="flex-direction:column;align-items:stretch">
+        <button class="abtn" style="text-align:left">Export the grounded set — 4 verified claims with certificates, for your comparison page</button>
+        <button class="abtn" style="text-align:left">Send the FDA defeat to the producer's compliance contact</button>
+        <button class="abtn" style="text-align:left">Hold "natural anti-inflammatory" as assumption pending clinical evidence</button>
+        <button class="abtn" style="text-align:left">Queue (label, claim) as a hard negative for your product-review agent</button>
+      </div>
+      <div class="hint">Every action writes an event to the ledger. The document becomes a source
+      node with a reputation: 2 of its 6 claims lack working certificates. The next label from
+      this producer starts from that number.</div>
+      <div class="actions"><button class="abtn" onclick="go('s-home')">Back to start</button></div>
+    </div>
+  </div>
+</div>
+
+<script>
+function go(id){
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("on"));
+  document.getElementById(id).classList.add("on");
+  window.scrollTo({top:0});
+}
+</script>
+</body>
+</html>
