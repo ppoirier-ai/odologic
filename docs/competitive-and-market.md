@@ -82,6 +82,57 @@ That is currently a belief with a mechanism sketch. It survives or dies on four 
 Answers to those four decide whether the crowdsourcing section of the thesis is a revenue
 line or a governance argument. They should not be blended.
 
+## Competitor findings, sourced
+
+Status note: the subagent fan out that was supposed to gather this timed out four times over.
+Everything below was pulled and read by me directly, so it is a partial set, not a finished
+landscape. Rows marked PENDING are still unverified and must not go in front of an investor.
+
+### Group 1, memory and context layers
+
+These are the systems that try to remember the user across sessions. They are the group a
+buyer will compare Odologic against first, and they are the weakest fit on the axis.
+
+Mem0. The memory layer for AI, memory layer as infrastructure for other apps, $24M round
+announced 28 October 2025, plus a free hobby tier and paid plans. Stores extracted facts and
+preferences about the user to inject as context. It has the plumbing and the distribution, and
+what it does not have is status or defeasibility: a stored item has no theorem/assumption
+distinction, no defeats, and citation-wise it is provenance-light. That is the row to watch,
+because adding claim status to an existing memory store is the cheapest possible version of
+this product. Sources: https://mem0.ai/series-a and https://mem0.ai/pricing
+
+Engram. AI memory startup, raised $98 million announced 23 June 2026, investors include
+General Catalyst, Kleiner Perkins, Sequoia and Andrej Karpathy, positioned around cutting
+token costs through better memory. This is the newest well funded entrant and it confirms the
+memory layer is a funded category, not a niche. It is an efficiency play, not a judgment play,
+which is the useful contrast: capital is flowing to "remember more cheaply", not to "record
+what was defeated and by whom". Source:
+https://www.cnbc.com/2026/06/23/ai-memory-startup-focused-on-cutting-token-costs-raises-98-million.html
+
+Claude memory, import and export. Anthropic ships memory import and export for Free, Pro,
+Max and Team plans on web and desktop, and the documented flow is literally a prompt you paste
+asking your current provider to dump your memory, then re-importing it into Claude. This
+matters twice. First, per assistant memory portability already exists, which weakens the
+strongest form of the lock-in argument: the mass of remembered facts is not actually trapped.
+Second, it sharpens the real gap, because what gets exported is a pile of facts in prose with
+no status, no defeats, and no record of which were injected where. The thing that is not
+exportable is the derivation, not the content. Source:
+https://support.claude.com/en/articles/12123587-import-and-export-your-memory-from-claude
+
+Glean. Enterprise search and assistant with a reported $200M+ ARR and a $150M Series F at a
+$7.2B valuation announced June 2025. PENDING, the press page returned an empty body when I
+pulled it, so the ARR and valuation figures are unconfirmed and should be checked against the
+Glean blog post or the funding announcement before use.
+
+Notion AI, Obsidian plus AI plugins, Rewind/Limitless, Gemini personalization, Dust. PENDING,
+not yet sourced.
+
+### Group 2, governance, compliance, observability (PENDING)
+
+### Group 3, guardrails, provenance, grounding, graph and temporal databases (PENDING)
+
+### Group 4, argument and deliberation mapping tools (PENDING)
+
 ## Verified anchors so far (direct sources, not subagent output)
 
 These were pulled and read directly. Figures from vendor sponsored or SEO report mills are
