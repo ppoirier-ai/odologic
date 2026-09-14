@@ -117,6 +117,50 @@ record is not itself absorbed in a usable form.
 4. You cannot verify a promise, only detect a violation. The probe is evidence, not prevention, and
    the pitch should say evidence.
 
+## If confidentiality arrives (FHE or attested enclaves)
+
+Assume the strong version: inference runs on ciphertext, or inside an attested enclave, and the
+provider never reads the prompt or the answer. Then:
+
+1. Variant 1 and variant 2 absorption die. A provider cannot train on, or memorise, what it
+   cannot read, so per user absorption and population consensus both become infeasible rather
+   than merely forbidden.
+2. The content moat is dead in the same stroke, and this is the important part: if nobody can
+   read user maps, then no vendor can build an exclusive corpus advantage out of them. So the
+   question of who accumulates the most content stops mattering.
+3. The aggregate moat survives, but only as a consented aggregate, and it gets stronger. Because
+   unauthorised aggregation becomes cryptographically infeasible instead of legally prohibited,
+   the licensed aggregate turns into a genuinely exclusive asset: it cannot be scraped, cannot be
+   absorbed, and can only be granted. Cryptography converts a legal restriction into a physical
+   one, which is precisely the property that makes the strongest moats strong.
+4. Cryptography creates no exclusivity on its own. FHE is an open standard, so if it becomes
+   universal every vendor offers blindness and confidentiality stops being a differentiator, the
+   same way open source telemetry already removed data sovereignty as a differentiator. What
+   remains exclusive is the keys, the consent, and the calibration credential.
+5. Verification becomes the new moat layer. Encrypted inference means the user cannot see what
+   was computed, so the demand shifts to proving it: attestation reports, signed records of what
+   the model was given and what it returned. That is a longer lease on the hardware roots and
+   revocation entry in the catalogue, and it is a new one: verifiable inference records.
+6. New vulnerability, and it is not small. If confidentiality depends on trusted hardware, the
+   party that can read everything becomes the silicon vendor, since enclave trust is trust in
+   their attestation. Provider level absorption is replaced by hardware vendor level trust, which
+   is a landlord nobody in this story controls. A TEE based answer to absorption moves the trust
+   problem down one layer rather than removing it.
+7. Practical caveats. Homomorphic inference at transformer scale carries heavy overhead today, so
+   attested enclaves are the realistic near term form, and their trust model differs. Providers
+   may also refuse encrypted inference outright, because they cannot moderate what they cannot
+   read, which means confidentiality will likely arrive through local open weight models first,
+   and in that scenario the counterparty is not a lab at all.
+8. The weakest link moves to the endpoint. If the ledger and the brief sit on the user's device
+   in plaintext, or the harness is the decrypting party, the leak is the client rather than the
+   provider.
+
+Net: a data moat still exists, but its location moves from content to access, and its enforcement
+moves from terms of service to mathematics. The exclusivity still comes from consent, calibration
+and institutional position, because the cryptography is available to everyone.
+
+
+
 ## Product implications, in order of urgency
 
 1. Sign or hash brief selections and store them in the trace, so any later claim about what the
