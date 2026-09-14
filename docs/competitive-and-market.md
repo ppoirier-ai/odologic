@@ -315,6 +315,103 @@ rigour. Two consequences, and both are product requirements rather than position
 must import from a vault on day one, and it must sell the ledger rather than the notes, because
 if it looks like a note app it will be compared to a free one.
 
+## Differentiation: against digital twins, against the model, against the competitor groups
+
+Three separate comparisons get run in the same conversation, and they need separate answers,
+because two of them are structural and one is narrow.
+
+### Against digital twins
+
+Two different things carry that name, and both are the opposite direction of travel.
+
+A digital twin of a system or organization is a dynamic software model fed by operational and
+contextual data, used to simulate, monitor, predict and optimize. Gartner's definition of the
+organizational version is exactly that: a dynamic software model that relies on operational and
+contextual data to understand how an organization operates. The market is real and large, on
+the order of $39.45B in 2025 heading to $53.60B in 2026 per one forecast. Sources:
+https://www.gartner.com/en/documents/5936107 and
+https://www.marketresearchfuture.com/reports/digital-twin-market-4504
+
+A digital twin of a person is the newer version: software that clones your voice, video and
+expertise so it can act where you would have acted. Delphi markets itself as turning your
+expertise into an always-on presence, CES 2026 showed employee clones built from a person's
+voice, video and knowledge, and Reid Hoffman published a Q&A with his own AI twin. Sources:
+https://www.delphi.ai/ and
+https://www.euronews.com/next/2026/01/07/ai-software-that-can-create-digital-clones-of-employees-unveiled-at-ces-2026
+
+The differentiation is direction of information flow, and it is clean.
+
+    digital twin of a system    models the thing, then predicts and optimizes it   forward
+    digital twin of a person    reproduces your output, then acts in your place    forward
+    Odologic                    records what was claimed and what defeated it     backward
+
+A twin extrapolates. A ledger adjudicates. A twin of a person is the extreme version of the GPS
+failure: your clone speaks with your authority, and when it is wrong there is nothing to
+inspect, no derivation, no way to see which of your positions it was leaning on when it
+answered. Odologic does not act as you and does not simulate anything. It is the record that
+makes the acting accountable, including when the actor is a model. That is also why this is not
+a competitor relationship: a personal twin is a customer for a ledger, because the moment
+someone delegates their voice they need the derivation on file.
+
+### Against LLMs and a possible AGI
+
+Not a competitor, a substrate, and the pitch has to make that unmistakable or it gets filed as
+a wrapper.
+
+The model is the thing that lost the derivation: non deterministic, no replayable trace,
+unfaithful self-reported reasoning. Odologic does not try to out reason it and does not need
+capability parity. Its differentiation is a property the model structurally cannot have:
+stateless between sessions, model agnostic, cumulative across models and years, owned by the
+person rather than the landlord, and holding judgment rather than knowledge. A lab cannot offer
+that even in principle, because it is not neutral (it rents the model), it sells to the
+operator rather than the person, and it cannot hold a record that has to survive switching to
+its competitor.
+
+Against AGI specifically, the honest version: differentiation is not about capability, it is
+about what is left over when capability stops being scarce.
+
+1. As models get better, the personalization value falls. A stronger model needs less briefing.
+   Do not build the pitch on the brief alone.
+2. What survives capability growth is the record: what you authorized, what was done, what
+   happened, and whose judgment turned out right. Better models argue better and remain unable
+   to be your accountable record, which is why the audit value rises as the interface value
+   falls.
+3. The tail risk is real and already hedged in the schema: under full labor displacement the
+   audit of human judgment loses its buyer, and the surviving use is machine to machine
+   attestation. That is why human and machine agents are symmetric first class subjects in the
+   data model. Say it as an insurance policy, not as the plan.
+
+### Against the competitor groups
+
+Differentiated today, on exactly one axis: claim status as an enforced lifecycle, computed
+defeat, and the brief. Nothing in the four groups ships all three, and the provenance objection
+is answered by the fact that PROV-O solved provenance as a standard and no standards body has a
+vocabulary for defeat.
+
+But the differentiation is narrow in three places, and pretending otherwise is how this pitch
+gets picked apart:
+
+1. Memory layers. Adding claim status and defeats to an existing memory store is the cheapest
+   path to a lookalike, and Mem0, Engram and the assistant vendors all have the plumbing and
+   the distribution already. The feature gap is one product cycle wide.
+2. Grounding stacks. GraphRAG and Vectara can show you the source, so a buyer may reasonably
+   conclude they have inspected reasoning. The gap is real but it has to be demonstrated, not
+   asserted.
+3. Free substrates. Argdown already provides a text native defeasible format with typed attacks,
+   and Obsidian provides local first ownership plus LLM query at no cost. Anything Odologic
+   sells as format or ownership is already free.
+
+So the defensible claim is not the feature set. It is (a) the accumulated adjudicated record,
+which compounds and cannot be copied retrospectively, (b) neutrality, since a memory vendor or a
+lab structurally cannot be neutral across models, and (c) guaranteed export, which converts
+lock-in panic into an adoption argument. The feature set is the entry ticket, not the moat.
+
+One more line worth stating plainly in every version of this: as a market, the category is not
+proven. That is a category creation problem, not a differentiation problem, and it is the honest
+reason the framing leans on an analogy (Excel's dependency tracing for judgment) rather than on
+comparables.
+
+
 ## Closing read: where the wedge actually is
 
 Across all four groups, no product in this scan ships a first class claim status lifecycle
