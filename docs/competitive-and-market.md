@@ -181,9 +181,11 @@ legitimacy asset with a demonstrated acquisition comparable, not a proven revenu
 
 ## Competitor findings, sourced
 
-Status note: the subagent fan out that was supposed to gather this timed out four times over.
-Everything below was pulled and read by me directly, so it is a partial set, not a finished
-landscape. Rows marked PENDING are still unverified and must not go in front of an investor.
+Status note: the fan out that gathered this was uneven. Three of the six children timed out
+after searching for ten minutes without answering, so groups 2, 3 and 4 come from two children
+that did finish, and I re-verified their load bearing figures (Credo AI, Arize, Langfuse and
+ClickHouse) directly. Group 1 I gathered myself. Rows marked PENDING or UNVERIFIED are exactly
+that and must not go in front of an investor without re-sourcing.
 
 ### Group 1, memory and context layers
 
@@ -224,11 +226,105 @@ Glean blog post or the funding announcement before use.
 Notion AI, Obsidian plus AI plugins, Rewind/Limitless, Gemini personalization, Dust. PENDING,
 not yet sourced.
 
-### Group 2, governance, compliance, observability (PENDING)
+### Group 2, governance, compliance, observability and evaluation
 
-### Group 3, guardrails, provenance, grounding, graph and temporal databases (PENDING)
+Two sub clusters, and neither records a judgment.
 
-### Group 4, argument and deliberation mapping tools (PENDING)
+Governance and GRC platforms. Credo AI (model inventory, policy packs mapped to NIST AI RMF
+and the EU AI Act, risk assessments, approval workflows; $21M Series B in July 2024 taking
+total funding to $41.3M, from the company's own blog), Holistic AI (bias and robustness
+auditing plus regulation readiness, funding UNVERIFIED because the aggregator figure I saw was
+clearly a scraped mashup), IBM watsonx.governance (model cards, lifecycle gates, drift and
+fairness monitoring, evidence collection), Microsoft Foundry with the Responsible AI dashboard,
+Vanta and Drata (compliance automation with AI modules bolted onto SOC 2 style evidence
+collection), and OneTrust (AI inventory and assessment inside a privacy suite). What they all
+record is policies, controls, risks, attestations and evidence artefacts. A risk is a scored
+register row, not a claim that can be defeated by an attached counter claim. That is the whole
+gap in one sentence.
+
+Observability and evaluation. LangSmith, Langfuse, Arize, Braintrust, Weights and Biases Weave,
+Humanloop, Patronus AI and Galileo. These record traces, spans, tokens, scores, evaluator
+versions, annotations and detectors. Arize announced a $70M Series C on 20 February 2025
+(confirmed on the press release and the company blog). Langfuse's acquisition by ClickHouse is
+confirmed from two primary sources, ClickHouse's own post and Langfuse's joining announcement,
+and it matters: an open source, self hostable telemetry store removes the data sovereignty
+objection in the observability layer, so that cannot be part of our differentiation story.
+
+The structural read, which is more important than any single row: an enterprise can satisfy
+its written audit obligations today with a GRC platform plus an observability platform, and
+neither of those records defeasibility. The nearest substitute is therefore not a vendor, it is
+that bundle. The two highest threats are Microsoft's Responsible AI dashboard, because decision
+path and counterfactual views are the only derivation-like inspectability in the whole set, and
+the generic enterprise phrase "AI decision audit trail", because a governance committee will
+accept it as the answer while it logs inputs, model version, outcome and approver without any
+structured warrant. Odologic's job in that room is to show the difference between logging a
+decision and warranting a judgment.
+
+### Group 3, guardrails, provenance and grounding, graph and temporal databases
+
+Guardrails. NVIDIA NeMo Guardrails (free, Apache licensed, programmable Colang rails), Guardrails
+AI (validators enforcing output schemas), Lakera (prompt injection and jailbreak detection,
+acquired by Check Point), Robust Intelligence (now Cisco AI Defense). All of them govern model
+inputs and outputs. None of them inspects judgment. The threat is positioning, not product:
+"we have guardrails" can be mistaken for "we have inspectable judgment".
+
+Provenance and grounding, the closest overlap on our own axis. Microsoft GraphRAG (MIT
+licensed, entity and community graph over a corpus, source text unit provenance) is the single
+most common "we already have that" objection, because its output looks authoritative while
+conflicting statements are merged into community summaries rather than adjudicated. Vectara
+(citation bearing grounded generation plus a hallucination detection model) and whyhow.ai
+(chunk level provenance links, early stage, corporate status uncertain as of 2026) are the
+enterprise grade versions. Chroma is storage with arbitrary metadata, which is exactly how
+teams convince themselves they can fake a judgment ledger. The pattern across all of them:
+they can show you the source, they cannot show you what defeated what.
+
+Temporal and logic databases. XTDB and Datomic, plus the Datalog lineage of Crux. Immutable
+history plus explicit rules gives a fully inspectable substrate, and no claim semantics at all.
+A sophisticated buyer can say "XTDB plus our schema is Odologic", and the honest answer is that
+the substrate plus the schema is the product, and almost nobody builds the schema or the brief.
+
+Provenance as a standard. W3C PROV-O, RDF reification, named graphs, and frameworks like
+Cognee and TrustGraph. This is the sharpest reframe in the whole exercise: provenance is
+genuinely solved as a standard. Nobody has a published vocabulary for claim status or defeat.
+So provenance is table stakes and judgment is the missing layer, and that is how the wedge
+should be stated: status lifecycle, computed defeat, and the brief. Not provenance.
+
+### Group 4, argument mapping and personal knowledge management
+
+The strongest rhetorical threats live here, because these are the tools that already prove
+people will do the work.
+
+Kialo. Structured pro and con debate trees where an objection is literally a competing node.
+Free for public and education use, paid tiers for private and enterprise (tier pricing
+UNVERIFIED). It is the closest consumer grade match on defeasibility, and it lacks provenance
+typing, model proposal lineage, and any brief a model can consume. Cite it as validation that
+the behaviour exists, not as an empty competitor.
+
+Argdown. A plain text, markdown-like argument format with typed attacks including undercutters
+and rebuttals, free and open source, file based and fully portable. This is the "we could just
+use a text format" objection in its strongest form, and it is a real one: the format is solved
+and free, so the differentiation has to be the lifecycle, the provenance typing and the brief.
+
+Rationale. Commercial visual argument mapping for decisions, tree based, no AI native brief.
+
+Obsidian with AI plugins, and the wider linked note tools (Logseq, Roam, RemNote, Tana,
+Anytype). Local first markdown, plugin ecosystem, LLM query over the vault, maximum ownership
+and portability. This is the highest switching cost problem we have: for a technical user, the
+vault plus a plugin already looks like most of the value proposition, for free, minus the
+rigour. Two consequences, and both are product requirements rather than positioning: Odologic
+must import from a vault on day one, and it must sell the ledger rather than the notes, because
+if it looks like a note app it will be compared to a free one.
+
+## Closing read: where the wedge actually is
+
+Across all four groups, no product in this scan ships a first class claim status lifecycle
+(theorem, observation, assumption, contested, defeated), computes defeat relations, or projects
+a compact brief back into an arbitrary model. Groups 1 and 2 compete for the trust budget.
+Groups 3 and 4 compete for the workflow and the substrate. The two objections to rehearse until
+they are boring: "GraphRAG already gives us provenance" (answer: provenance is table stakes,
+PROV-O solved it, adjudication is what is missing) and "my Obsidian vault plus a plugin is
+enough" (answer: nothing enforces status, nothing computes defeat, and here is the import).
+
 
 ## Verified anchors so far (direct sources, not subagent output)
 
