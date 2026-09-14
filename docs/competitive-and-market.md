@@ -82,6 +82,103 @@ That is currently a belief with a mechanism sketch. It survives or dies on four 
 Answers to those four decide whether the crowdsourcing section of the thesis is a revenue
 line or a governance argument. They should not be blended.
 
+## What human judgment actually sells for (pricing regimes, sourced)
+
+Six distinct regimes, and they price completely different things. This is the most useful
+table in the doc, because it shows there is no established price for what Odologic proposes to
+sell.
+
+    regime                        example                 price                   paid on
+    1 conversation                GLG, Third Bridge       ~$400 to $2,000 a call  time and credentials
+    2 consented insight library   Tegus (to AlphaSense)   $930M acquisition       one call resold to many
+    3 expert hour at scale        Mercor                  ~$109 an hour average   credentials and time
+    4 per task commodity judgment Toloka, Scale          $0.02 to $0.20 an item  volume
+    5 scored forecasting          Metaculus               paid nothing            reputation only
+    6 settled market price        Kalshi, Polymarket      trading P&L plus fees   capital at risk
+
+Verified anchors for the ones that matter:
+
+Tegus. AlphaSense closed the acquisition of Tegus for $930 million on 8 July 2024, alongside a
+$650M round that took AlphaSense to a $4B valuation. This is the clearest single price ever put
+on a shared, consented library of human insight, and it is the closest comparable to a
+collective map. Source:
+https://www.prnewswire.com/news-releases/alphasense-completes-acquisition-of-tegus-302190934.html
+
+Mercor. Annualized revenue estimated at $2.00B with a $10B valuation in 2025 and $486M raised,
+per Sacra, updated August 2026. Sacra is an estimate shop rather than a filing, so treat as
+estimated. Implication: expert judgment can be metered by the hour and sold to AI labs at
+billions, which sets the ceiling on what time and credentials alone are worth. Source:
+https://sacra.com/c/mercor/
+
+Shutterstock. Contributors receive a 20 percent average corporate royalty on the revenue
+Shutterstock receives for dataset licensing, per Shutterstock's own contributor help page, and
+the company reported $104 million of AI licensing revenue in 2023. This is the only clean
+published revenue share rate for clean human data, and it is the honest benchmark for a
+contributor payout on a shared map. Sources:
+https://submit.shutterstock.com/help/en/articles/10594694-shutterstock-data-licensing-and-the-contributor-fund
+and https://petapixel.com/2024/06/04/shutterstock-made-104-million-licensing-assets-to-ai-devs-last-year/
+
+Prediction markets. Combined monthly volume on the major platforms rose from under $5B in
+September 2025 to about $24B in April 2026, with sports making up 80 percent of Kalshi volume.
+Settled judgment clears at scale, but the mix says the volume is entertainment-adjacent rather
+than analytical. Source:
+https://www.pewresearch.org/short-reads/2026/05/27/trading-volume-on-prediction-markets-has-soared-in-recent-months/
+
+News Corp and Axel Springer to OpenAI. Reported at more than $250M over five years and at tens
+of millions of euros a year respectively. Both are press reported rather than confirmed by the
+parties in a filing, and I could not re-pull the primary pages (one blocked, one paywalled), so
+these stay as reported. The mechanism they demonstrate is the one that matters: price tracked
+accountable authorship and editorial process, not token count.
+
+The gap this exposes. Nobody in this evidence base pays a person on verified track record.
+Expert networks pay per hour, crowd platforms pay per task, prediction markets pay through
+trading profit and loss, Metaculus pays reputation only, and even Shutterstock's 20 percent is
+a share of licensing revenue rather than a function of how right anyone was. Quality weighted
+compensation against a calibration record is genuinely un-priced in the market. That cuts both
+ways and both sides belong in the pitch: it is the differentiator, and it is the reason there
+is no benchmark to anchor price expectations against.
+
+## The collective map: what the evidence supports, and what it does not
+
+Four facts decide the crowdsourcing section. Stated as findings, not hopes.
+
+1. Aggregation beats the typical individual, but only under conditions. The standard
+conditions are diversity, independence, decentralization and aggregation, and Page's diversity
+prediction theorem (PNAS 2004) formalizes it: crowd error equals average individual error minus
+diversity. There is also counter evidence, an empirical study that found no significant
+correlation between prediction diversity and collective error, so diversity alone is not a
+mechanism. The design consequence is the important part: a ledger that records each person's
+claim and position separately preserves independence and makes aggregation explicit, and
+adjudicated defeats are what stop diversity from degrading into correlated error. Odologic's
+structure is not a nicety here, it is the thing the theorem requires.
+
+2. Correlated error is the failure mode to design against, not disagreement. Where
+contributors see each other's positions or chase the same incentive, errors correlate and the
+crowd collapses toward a single amplified opinion. Consequence: scoping and separation, no
+upvote chasing, no popularity signal on claims, and a record of who influenced what.
+
+3. Content value does depreciate, and Stack Overflow is the live proof. The corpus was licensed
+to model providers while its contributor supply collapsed: peak of roughly 207k questions a
+month in March 2014 down to launch era lows, and only 3,862 questions in December 2025, a 78
+percent year over year drop. The nuance that matters for us: the decline started in 2014, a
+decade before LLMs, tracking tougher closures of "low quality" questions. So the commons was
+killed twice, once by over-gating that was not contestable and once by substitution.
+Consequence: any gating in Odologic must be a recorded, auditable adjudication, never closed
+authority.
+
+4. Legitimacy is the durable asset, and there is a price benchmark for it. The premium deals
+paid for accountable human authorship rather than volume, and the 2023 Stack Exchange moderator
+strike is the case study in what happens when the platform captures the value and the
+contributors are shut out. Consequence: if a contributor cannot see a path from their scoped
+item to pay and to a governance voice, supply leaves regardless of how good the aggregation is.
+
+Net read on the original claim: "a collective map is worth more than an individual one" is
+supported on coverage, error correction and price (Tegus at $930M is the proof that a shared
+insight library has real value), and it is NOT yet supported on a mechanism for paying
+contributors by verified accuracy, because that mechanism does not exist anywhere in the
+evidence. The honest line for the deck is that the collective map is a governance and
+legitimacy asset with a demonstrated acquisition comparable, not a proven revenue line.
+
 ## Competitor findings, sourced
 
 Status note: the subagent fan out that was supposed to gather this timed out four times over.
